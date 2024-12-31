@@ -8,9 +8,21 @@ import (
 var registeredPlugins = make(map[string]plugins.Plugin)
 
 func main() {
-	RegisterPlugin(plugins.VersionPlugin{})
-	RegisterPlugin(plugins.CPUPlugin{})
+	pluginCollection := []plugins.Plugin{
+        plugins.VersionPlugin{},
+        plugins.CPUPlugin{},
+		plugins.HardDriveFreeSpacePlugin{},
+    }
+
+	RegisterPlugins(pluginCollection)
 	CollectAll()
+}
+
+
+func RegisterPlugins(plugins []plugins.Plugin) {
+	for _, registrationPlugin := range plugins {
+		RegisterPlugin(registrationPlugin)
+	}
 }
 
 func RegisterPlugin(p plugins.Plugin) {
