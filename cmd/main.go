@@ -2,19 +2,44 @@ package main // определили пакет main
 
 import (
     "fmt"
+    "github.com/google/uuid"
     "project/internal/plugins"
 )
 
 var registeredPlugins = make(map[string]plugins.Plugin)
 
 func main() {
-	RegisterPlugin(plugins.VersionPlugin{})
-	RegisterPlugin(plugins.CPUPlugin{})
+	pluginCollection := []plugins.Plugin{
+        plugins.VersionPlugin{},
+        plugins.CPUPlugin{},
+		plugins.HardDriveFreeSpacePlugin{},
+
+        plugins.PostgreSqlQueryPlugin{
+            ConnectionString: "host=localhost port=5432 user=postgres password=bpmsoft dbname=01-pulse sslmode=disable",
+            Query:            "SELECT Count(\"Id\") FROM \"Contact\"", // Замените на ваш запрос
+            PluginName:       "Contacts count",
+        },
+
+        plugins.PostgreSqlQueryPlugin{
+            ConnectionString: "host=localhost port=5432 user=postgres password=bpmsoft dbname=01-pulse sslmode=disable",
+            Query:            "SELECT Count(\"Id\") FROM \"SysPrcPersistentStore\"", // Замените на ваш запрос
+            PluginName:       "Process logs count",
+        },
+    }
+
+	RegisterPlugins(pluginCollection)
 	CollectAll()
 }
 
+
+func RegisterPlugins(plugins []plugins.Plugin) {
+	for _, registrationPlugin := range plugins {
+		RegisterPlugin(registrationPlugin)
+	}
+}
+
 func RegisterPlugin(p plugins.Plugin) {
-    registeredPlugins[p.Name()] = p
+    registeredPlugins[uuid.New().String()] = p
 }
 
 func CollectAll() {
