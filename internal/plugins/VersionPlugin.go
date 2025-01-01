@@ -8,7 +8,7 @@ func (v VersionPlugin) Name() string {
 
 func (v VersionPlugin) Collect() (map[string]interface{}, error) {
     return map[string]interface{}{
-        "version": "1.0.0",
-        "status":  "stable",
+        "version": "0.0.1",
+        "status":  "pre-alpha",
     }, nil
 }
