@@ -1,4 +1,4 @@
-package main // определили пакет main
+package main
 
 import (
     "fmt"
@@ -16,13 +16,13 @@ func main() {
 
         plugins.PostgreSqlQueryPlugin{
             ConnectionString: "host=localhost port=5432 user=postgres password=bpmsoft dbname=01-pulse sslmode=disable",
-            Query:            "SELECT Count(\"Id\") FROM \"Contact\"", // Замените на ваш запрос
+            Query:            "SELECT Count(\"Id\") FROM \"Contact\"",
             PluginName:       "Contacts count",
         },
 
         plugins.PostgreSqlQueryPlugin{
             ConnectionString: "host=localhost port=5432 user=postgres password=bpmsoft dbname=01-pulse sslmode=disable",
-            Query:            "SELECT Count(\"Id\") FROM \"SysPrcPersistentStore\"", // Замените на ваш запрос
+            Query:            "SELECT Count(\"Id\") FROM \"SysPrcPersistentStore\"",
             PluginName:       "Process logs count",
         },
     }
