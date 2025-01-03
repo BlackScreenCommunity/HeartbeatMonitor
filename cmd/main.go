@@ -9,7 +9,8 @@ import (
 )
 
 type PluginConfig struct {
-	Name string `json:"name"`
+	Name       string                 `json:"name"`
+	Parameters map[string]interface{} `json:"parameters"`
 }
 
 var registeredPlugins = make(map[string]plugins.Plugin)
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	for _, cfg := range pluginsConfig {
-		plugin, err := plugins.CreatePlugin(cfg.Name)
+		plugin, err := plugins.CreatePlugin(cfg.Name, cfg.Parameters)
 		if err != nil {
 			fmt.Printf("Error creating plugin: %v\n", err)
 			continue
