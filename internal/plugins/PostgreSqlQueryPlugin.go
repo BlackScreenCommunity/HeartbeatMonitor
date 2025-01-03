@@ -3,6 +3,7 @@ package plugins
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/lib/pq"
 )
 
@@ -11,7 +12,7 @@ var pluginName = "PostgreSqlQueryPlugin"
 type PostgreSqlQueryPlugin struct {
 	ConnectionString string
 	Query            string
-	PluginName       string
+	InstanceName     string
 }
 
 func (p PostgreSqlQueryPlugin) Name() string {
@@ -19,7 +20,7 @@ func (p PostgreSqlQueryPlugin) Name() string {
 }
 
 func (p PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
-	pluginName = p.PluginName
+	pluginName = p.InstanceName
 
 	db, err := sql.Open("postgres", p.ConnectionString)
 	if err != nil {
