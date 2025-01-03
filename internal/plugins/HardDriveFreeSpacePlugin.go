@@ -2,9 +2,9 @@ package plugins
 
 import (
 	"fmt"
-	"github.com/shirou/gopsutil/v3/disk"
 	"math"
-	"strings"
+
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 type HardDriveFreeSpacePlugin struct{}
@@ -33,13 +33,7 @@ func (plgn HardDriveFreeSpacePlugin) Collect() (map[string]interface{}, error) {
 			"usedPercent": (math.Floor(usage.UsedPercent) * 100) / 100,                   // Процент использования
 		}
 
-		var sb strings.Builder
-
-		for key, value := range partitionTotals {
-			sb.WriteString(fmt.Sprintf("%s: %v\t", key, value))
-		}
-
-		result[partition.Mountpoint] = sb.String()
+		result[partition.Mountpoint] = partitionTotals
 	}
 
 	return result, nil
