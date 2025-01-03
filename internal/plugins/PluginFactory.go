@@ -6,6 +6,7 @@ import (
 
 func init() {
 	RegisterPluginType("VersionPlugin", func() Plugin { return &VersionPlugin{} })
+	RegisterPluginType("HardDriveFreeSpacePlugin", func() Plugin { return &HardDriveFreeSpacePlugin{} })
 }
 
 var registeredPlugins = make(map[string]func() Plugin)
