@@ -1,11 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"project/internal/plugins"
 
 	"github.com/google/uuid"
-	"github.com/spf13/viper"
 )
 
 type PluginConfig struct {
@@ -43,20 +44,20 @@ func main() {
 }
 
 func loadConfig() ([]PluginConfig, error) {
-	viper.SetConfigName("appsettings")
-	viper.SetConfigType("json")
-	viper.AddConfigPath(".")
+	file, err := os.Open("appsettings.json")
+	if err != nil {
+		return nil, fmt.Errorf("error opening config file: %v", err)
+	}
+	defer file.Close()
 
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("error reading config: %v", err)
+	var data struct {
+		Plugins []PluginConfig `json:"plugins"`
+	}
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		return nil, fmt.Errorf("error decoding config file: %v", err)
 	}
 
-	var plugins []PluginConfig
-	if err := viper.UnmarshalKey("plugins", &plugins); err != nil {
-		return nil, fmt.Errorf("error unmarshalling plugins: %v", err)
-	}
-
-	return plugins, nil
+	return data.Plugins, nil
 }
 
 func RegisterPlugins(plugins []plugins.Plugin) {
