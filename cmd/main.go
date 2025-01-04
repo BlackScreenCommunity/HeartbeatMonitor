@@ -10,8 +10,8 @@ import (
 )
 
 type PluginConfig struct {
-	Name       string                 `json:"name"`
-	Parameters map[string]interface{} `json:"parameters"`
+	Name       string
+	Parameters map[string]interface{}
 }
 
 var registeredPlugins = make(map[string]plugins.Plugin)
@@ -51,7 +51,7 @@ func loadConfig() ([]PluginConfig, error) {
 	defer file.Close()
 
 	var data struct {
-		Plugins []PluginConfig `json:"plugins"`
+		Plugins []PluginConfig
 	}
 	if err := json.NewDecoder(file).Decode(&data); err != nil {
 		return nil, fmt.Errorf("error decoding config file: %v", err)
