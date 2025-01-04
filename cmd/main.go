@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"project/internal/pluginFactory"
 	"project/internal/plugins"
 
 	"github.com/google/uuid"
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	for _, cfg := range pluginsConfig {
-		plugin, err := plugins.CreatePlugin(cfg.Name, cfg.Parameters)
+		plugin, err := pluginFactory.CreatePlugin(cfg.Name, cfg.Parameters)
 		if err != nil {
 			fmt.Printf("Error creating plugin: %v\n", err)
 			continue

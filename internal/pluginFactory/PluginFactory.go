@@ -1,23 +1,25 @@
-package plugins
+package pluginFactory
 
 import (
 	"fmt"
 	"reflect"
+
+	"project/internal/plugins"
 )
 
 func init() {
-	RegisterPluginType("VersionPlugin", func() Plugin { return &VersionPlugin{} })
-	RegisterPluginType("HardDriveFreeSpacePlugin", func() Plugin { return &HardDriveFreeSpacePlugin{} })
-	RegisterPluginType("PostgreSqlQueryPlugin", func() Plugin { return &PostgreSqlQueryPlugin{} })
+	RegisterPluginType("VersionPlugin", func() plugins.Plugin { return &plugins.VersionPlugin{} })
+	RegisterPluginType("HardDriveFreeSpacePlugin", func() plugins.Plugin { return &plugins.HardDriveFreeSpacePlugin{} })
+	RegisterPluginType("PostgreSqlQueryPlugin", func() plugins.Plugin { return &plugins.PostgreSqlQueryPlugin{} })
 }
 
-var registeredPlugins = make(map[string]func() Plugin)
+var registeredPlugins = make(map[string]func() plugins.Plugin)
 
-func RegisterPluginType(name string, constructor func() Plugin) {
+func RegisterPluginType(name string, constructor func() plugins.Plugin) {
 	registeredPlugins[name] = constructor
 }
 
-func CreatePlugin(name string, params map[string]interface{}) (Plugin, error) {
+func CreatePlugin(name string, params map[string]interface{}) (plugins.Plugin, error) {
 	constructor, exists := registeredPlugins[name]
 	if !exists {
 		return nil, fmt.Errorf("plugin type '%s' not registered", name)
