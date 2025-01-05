@@ -5,8 +5,6 @@ import (
 	"project/internal/pluginConfigurationLoader"
 	"project/internal/pluginFactory"
 	"project/internal/plugins"
-
-	"github.com/google/uuid"
 )
 
 var registeredPlugins = make(map[string]plugins.Plugin)
@@ -36,7 +34,9 @@ func RegisterPlugins(plugins []plugins.Plugin) {
 }
 
 func RegisterPlugin(p plugins.Plugin) {
-	registeredPlugins[uuid.New().String()] = p
+	pluginNumber := fmt.Sprintf("%04d", len(registeredPlugins)+1)
+
+	registeredPlugins[pluginNumber+"_"+p.Name()] = p
 }
 
 func CollectAll() {
