@@ -27,10 +27,10 @@ func (plgn HardDriveFreeSpacePlugin) Collect() (map[string]interface{}, error) {
 		}
 
 		partitionTotals := map[string]interface{}{
-			"total":       (math.Floor(float64(usage.Total)/1024/1024/1024) * 100) / 100, // Общее пространство (в байтах)
-			"free":        (math.Floor(float64(usage.Free)/1024/1024/1024) * 100) / 100,  // Свободное пространство (в байтах)
-			"used":        (math.Floor(float64(usage.Used)/1024/1024/1024) * 100) / 100,  // Используемое пространство (в байтах)
-			"usedPercent": (math.Floor(usage.UsedPercent) * 100) / 100,                   // Процент использования
+			"total":       (math.Round(float64(usage.Total)/1024/1024/1024) * 100) / 100, // Общее пространство (в байтах)
+			"free":        (math.Round(float64(usage.Free)/1024/1024/1024) * 100) / 100,  // Свободное пространство (в байтах)
+			"used":        (math.Round(float64(usage.Used)/1024/1024/1024) * 100) / 100,  // Используемое пространство (в байтах)
+			"usedPercent": (math.Round(usage.UsedPercent) * 100) / 100,                   // Процент использования
 		}
 
 		result[partition.Mountpoint] = partitionTotals
