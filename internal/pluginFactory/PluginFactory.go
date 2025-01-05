@@ -11,6 +11,7 @@ func init() {
 	RegisterPluginType("VersionPlugin", func() plugins.Plugin { return &plugins.VersionPlugin{} })
 	RegisterPluginType("HardDriveFreeSpacePlugin", func() plugins.Plugin { return &plugins.HardDriveFreeSpacePlugin{} })
 	RegisterPluginType("PostgreSqlQueryPlugin", func() plugins.Plugin { return &plugins.PostgreSqlQueryPlugin{} })
+	RegisterPluginType("FolderSizePlugin", func() plugins.Plugin { return &plugins.FolderSizePlugin{} })
 }
 
 var registeredPlugins = make(map[string]func() plugins.Plugin)
