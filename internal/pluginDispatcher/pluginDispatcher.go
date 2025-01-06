@@ -39,15 +39,26 @@ func RegisterPlugin(p plugins.Plugin) {
 	registeredPlugins[pluginNumber+"_"+p.Name()] = p
 }
 
-func CollectAll() {
+func CollectAll() map[string]interface{} {
+
+	pluginResultCollection := make(map[string]interface{})
+
 	for name, plugin := range registeredPlugins {
 		data, err := plugin.Collect()
 		if err != nil {
 			fmt.Printf("Error collecting data from plugin %s: %v\n", name, err)
 			continue
 		}
-		fmt.Printf("=== %s ===\n", plugin.Name())
-		for key, value := range data {
+		pluginResultCollection[plugin.Name()] = data
+	}
+	return pluginResultCollection
+}
+
+// TODO Поправить вывод в консоль
+func PrintPluginResult(pluginResultCollection map[string]interface{}) {
+	for pluginResult := range pluginResultCollection {
+		// fmt.Printf("=== %s ===\n", plugin.Name())
+		for key, value := range pluginResult {
 			fmt.Printf("%-15s: %v\n", key, value)
 		}
 		fmt.Println()
