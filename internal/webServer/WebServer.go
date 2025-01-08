@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"project/internal/pluginDispatcher"
 	"project/internal/utils"
+	"text/template"
 )
 
 func RunServer() {
@@ -21,6 +23,7 @@ func RunServer() {
 func InitEndpoints() {
 
 	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
+	http.HandleFunc("/", IndexPageHandler)
 
 }
 
@@ -38,4 +41,33 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 
 	responseWriter.Header().Set("Content-Type", "application/json")
 	responseWriter.Write([]byte(string(jsonData)))
+}
+
+func getTemplatePath() string {
+	absPath, err := filepath.Abs("./internal/webserver/index.html")
+	if err != nil {
+		panic(err)
+	}
+	return absPath
+}
+
+func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	pluginResultCollection := pluginDispatcher.CollectAll()
+
+	cleanResults := utils.MapDereference(pluginResultCollection)
+	pageTemplate := template.Must(template.ParseFiles(getTemplatePath()))
+
+	pageData := struct {
+		Title   string
+		Plugins map[string]interface{}
+	}{
+		Title:   "Plugin Data",
+		Plugins: cleanResults,
+	}
+
+	responseWriter.Header().Set("Content-Type", "text/html")
+	if err := pageTemplate.Execute(responseWriter, pageData); err != nil {
+		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
+	}
+
 }
