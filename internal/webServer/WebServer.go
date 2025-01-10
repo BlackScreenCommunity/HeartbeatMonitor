@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path/filepath"
 	"project/internal/pluginDispatcher"
 	"project/internal/utils"
 	"reflect"
@@ -28,7 +27,6 @@ func renderList(data interface{}) template.HTML {
 		html += "</ul>"
 		return template.HTML(html)
 	default:
-		// return template.HTML(template.HTMLEscapeString(reflect.ValueOf(data).String()))
 		return template.HTML(template.HTMLEscapeString(fmt.Sprintf("%v", data)))
 	}
 }
@@ -66,27 +64,11 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 	responseWriter.Write([]byte(string(jsonData)))
 }
 
-func getTemplatePath() string {
-	absPath, err := filepath.Abs("./templates/index.html")
-	if err != nil {
-		panic(err)
-	}
-	return absPath
-}
-
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	pluginResultCollection := pluginDispatcher.CollectAll()
-
-	cleanResults := utils.MapDereference(pluginResultCollection)
-
-	jsonData, err := json.MarshalIndent(cleanResults, "", "  ")
-
-	if err != nil {
-		return
-	}
+	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
 
 	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(jsonData), &data); err != nil {
+	if err := json.Unmarshal([]byte(pluginResultCollection), &data); err != nil {
 		panic(err)
 	}
 
@@ -98,5 +80,4 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	if err := pageTemplate.Execute(responseWriter, data); err != nil {
 		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
 	}
-
 }

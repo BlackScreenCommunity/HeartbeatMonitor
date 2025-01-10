@@ -1,10 +1,12 @@
 package pluginDispatcher
 
 import (
+	"encoding/json"
 	"fmt"
 	"project/internal/pluginConfigurationLoader"
 	"project/internal/pluginFactory"
 	"project/internal/plugins"
+	"project/internal/utils"
 )
 
 var registeredPlugins = make(map[string]plugins.Plugin)
@@ -51,7 +53,17 @@ func CollectAll() map[string]interface{} {
 		}
 		pluginResultCollection[plugin.Name()] = data
 	}
-	return pluginResultCollection
+	return utils.MapDereference(pluginResultCollection)
+}
+
+func GetPluginsJsonData() string {
+	jsonData, err := json.MarshalIndent(CollectAll(), "", "  ")
+
+	if err != nil {
+		return ""
+	}
+
+	return string(jsonData)
 }
 
 // TODO Поправить вывод в консоль
