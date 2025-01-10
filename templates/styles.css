@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #fff;
+    line-height: 1.6;
+    padding: 10px;
+}
+
+ul ul, ol ul, ul ol, ol ol {
+    background-color: #f9f9f9;
+    border-left: 3px solid #ddd;
+    padding-left: 15px;
+}
+
+ul ul ul, ol ul ul, ul ol ul, ol ol ul {
+    background-color: #f0f0f0;
+    border-left: 3px solid #bbb;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+li {
+    margin: 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+li > strong {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+li:hover {
+    background-color: #e9ecef;
+}
+
+.plugin-name {
+    font-weight: bold;
+    margin-top: 10px;
+}

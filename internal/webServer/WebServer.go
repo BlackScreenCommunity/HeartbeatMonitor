@@ -42,10 +42,9 @@ func RunServer() {
 }
 
 func InitEndpoints() {
-
 	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
 	http.HandleFunc("/", IndexPageHandler)
-
+	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
 }
 
 func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
