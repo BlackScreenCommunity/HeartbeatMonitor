@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	"project/internal/utils"
 	"reflect"
+	"strconv"
 )
 
 func renderList(data interface{}) template.HTML {
@@ -31,12 +33,12 @@ func renderList(data interface{}) template.HTML {
 	}
 }
 
-func RunServer() {
+func RunServer(config applicationConfigurationDispatcher.WebserverConfig) {
 
 	InitEndpoints()
 
-	fmt.Println("Server is running on port 8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Println("Server is running on port " + strconv.Itoa(config.Port))
+	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
 	}
 }

@@ -13,5 +13,5 @@ func main() {
 	}
 
 	pluginDispatcher.InitializePlugins(applicationConfiguration.Plugins)
-	webserver.RunServer()
+	webserver.RunServer(applicationConfiguration.Webserver)
 }
