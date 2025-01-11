@@ -1,18 +1,17 @@
 package main
 
 import (
-	"project/internal/pluginConfigurationLoader"
+	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	webserver "project/internal/webServer"
 )
 
 func main() {
-
-	pluginsConfig, shouldReturn := pluginConfigurationLoader.GetPluginsConfiguration()
+	applicationConfiguration, shouldReturn := applicationConfigurationDispatcher.GetConfigFromFile()
 	if shouldReturn {
 		return
 	}
-	pluginDispatcher.InitializePlugins(pluginsConfig)
 
+	pluginDispatcher.InitializePlugins(applicationConfiguration.Plugins)
 	webserver.RunServer()
 }

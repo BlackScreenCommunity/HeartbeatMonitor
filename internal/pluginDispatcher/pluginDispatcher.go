@@ -3,15 +3,20 @@ package pluginDispatcher
 import (
 	"encoding/json"
 	"fmt"
-	"project/internal/pluginConfigurationLoader"
+
 	"project/internal/pluginFactory"
 	"project/internal/plugins"
 	"project/internal/utils"
 )
 
+type PluginConfig struct {
+	Name       string
+	Parameters map[string]interface{}
+}
+
 var registeredPlugins = make(map[string]plugins.Plugin)
 
-func InitializePlugins(pluginsConfig []pluginConfigurationLoader.PluginConfig) {
+func InitializePlugins(pluginsConfig []PluginConfig) {
 	fmt.Println("Loaded plugin configurations:")
 	for _, plugin := range pluginsConfig {
 		fmt.Printf("Name: %s\n",
