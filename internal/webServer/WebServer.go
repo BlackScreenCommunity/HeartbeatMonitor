@@ -7,10 +7,61 @@ import (
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
-	"project/internal/utils"
 	"reflect"
 	"strconv"
 )
+
+var ServerInfo = applicationConfigurationDispatcher.ServerInfo{}
+
+func RunServer(webserverConfig applicationConfigurationDispatcher.WebserverConfig, serverInfo applicationConfigurationDispatcher.ServerInfo) {
+	ServerInfo = serverInfo
+
+	InitEndpoints()
+	StartServer(webserverConfig)
+}
+
+func InitEndpoints() {
+	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
+	http.HandleFunc("/", IndexPageHandler)
+	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
+}
+
+func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
+
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.Write([]byte(string(pluginResultCollection)))
+}
+
+func StartServer(config applicationConfigurationDispatcher.WebserverConfig) {
+	fmt.Println("Server is running on port " + strconv.Itoa(config.Port))
+	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
+		fmt.Printf("Failed to start server: %v\n", err)
+	}
+}
+
+func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
+
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(pluginResultCollection), &data); err != nil {
+		panic(err)
+	}
+
+	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{
+		"renderList": renderList,
+		"serverInfo": getServerName,
+	}).ParseFiles("templates/index.html"))
+
+	responseWriter.Header().Set("Content-Type", "text/html")
+	if err := pageTemplate.Execute(responseWriter, data); err != nil {
+		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
+	}
+}
+
+func getServerName() template.HTML {
+	return template.HTML(ServerInfo.Name)
+}
 
 func renderList(data interface{}) template.HTML {
 	switch reflect.TypeOf(data).Kind() {
@@ -30,55 +81,5 @@ func renderList(data interface{}) template.HTML {
 		return template.HTML(html)
 	default:
 		return template.HTML(template.HTMLEscapeString(fmt.Sprintf("%v", data)))
-	}
-}
-
-func RunServer(config applicationConfigurationDispatcher.WebserverConfig) {
-
-	InitEndpoints()
-
-	fmt.Println("Server is running on port " + strconv.Itoa(config.Port))
-	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
-		fmt.Printf("Failed to start server: %v\n", err)
-	}
-}
-
-func InitEndpoints() {
-	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
-	http.HandleFunc("/", IndexPageHandler)
-	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
-}
-
-func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	pluginResultCollection := pluginDispatcher.CollectAll()
-
-	cleanResults := utils.MapDereference(pluginResultCollection)
-	pluginDispatcher.PrintPluginResult(cleanResults)
-
-	jsonData, err := json.MarshalIndent(cleanResults, "", "  ")
-
-	if err != nil {
-		return
-	}
-
-	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.Write([]byte(string(jsonData)))
-}
-
-func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
-
-	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(pluginResultCollection), &data); err != nil {
-		panic(err)
-	}
-
-	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{
-		"renderList": renderList,
-	}).ParseFiles("templates/index.html"))
-
-	responseWriter.Header().Set("Content-Type", "text/html")
-	if err := pageTemplate.Execute(responseWriter, data); err != nil {
-		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
 	}
 }
