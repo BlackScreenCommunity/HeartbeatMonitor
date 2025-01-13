@@ -3,6 +3,7 @@ package plugins
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	_ "github.com/lib/pq"
 )
@@ -39,7 +40,9 @@ func (p PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 		return nil, fmt.Errorf("failed to get columns: %v", err)
 	}
 
-	results := make([]map[string]interface{}, 0)
+	results := make(map[string]interface{}, 0)
+	var rowNumber = 0
+
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
 		valuePtrs := make([]interface{}, len(columns))
@@ -55,10 +58,9 @@ func (p PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 		for i, col := range columns {
 			row[col] = values[i]
 		}
-		results = append(results, row)
+		results[strconv.Itoa(rowNumber)] = row
+		rowNumber++
 	}
 
-	return map[string]interface{}{
-		"rows": results,
-	}, nil
+	return results, nil
 }
