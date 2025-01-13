@@ -7,7 +7,9 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
-type HardDriveFreeSpacePlugin struct{}
+type HardDriveFreeSpacePlugin struct{
+    DriveMountPoint string
+}
 
 func (v HardDriveFreeSpacePlugin) Name() string {
 	return "HardDriveFreeSpacePlugin"
@@ -21,6 +23,9 @@ func (plgn HardDriveFreeSpacePlugin) Collect() (map[string]interface{}, error) {
 
 	result := make(map[string]interface{})
 	for _, partition := range partitions {
+        if(plgn.DriveMountPoint != partition.Mountpoint) {
+            continue
+        }
 		usage, err := disk.Usage(partition.Mountpoint)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get usage for partition %s: %v", partition.Mountpoint, err)
