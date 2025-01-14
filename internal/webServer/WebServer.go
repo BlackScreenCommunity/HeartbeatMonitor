@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	"reflect"
@@ -48,13 +49,22 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	agentResultCollection := agentDispatcher.CollectAll()
+
+	totalResults := make(map[string]interface{})
+	totalResults[ServerInfo.Name] = data
+
+	for k, v := range agentResultCollection {
+		totalResults[k] = v
+	}
+
 	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{
 		"renderList": renderList,
 		"serverInfo": getServerName,
 	}).ParseFiles("templates/index.html"))
 
 	responseWriter.Header().Set("Content-Type", "text/html")
-	if err := pageTemplate.Execute(responseWriter, data); err != nil {
+	if err := pageTemplate.Execute(responseWriter, totalResults); err != nil {
 		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
 	}
 }
