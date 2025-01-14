@@ -1,4 +1,4 @@
-package agentDispathcer
+package agentDispatcher
 
 import (
 	"encoding/json"
