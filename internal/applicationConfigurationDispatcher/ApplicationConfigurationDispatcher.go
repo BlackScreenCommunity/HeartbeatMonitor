@@ -15,10 +15,15 @@ type WebserverConfig struct {
 	Port int
 }
 
+type AgentConfig struct {
+	Address string
+}
+
 type ApplicationConfiguration struct {
 	Server    ServerInfo
 	Webserver WebserverConfig
 	Plugins   []pluginDispatcher.PluginConfig
+	Agents    []AgentConfig
 }
 
 func GetConfigFromFile() (ApplicationConfiguration, bool) {
