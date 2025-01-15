@@ -2,7 +2,6 @@ package agentDispatcher
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
@@ -20,34 +19,35 @@ func CollectAll() map[string]interface{} {
 
 	agentResultCollection := make(map[string]interface{})
 
-	for name, agent := range agents {
+	for _, agent := range agents {
+		var results map[string]interface{}
 
 		url := agent.Address + "/plugins/results"
 
 		resp, err := http.Get(url)
 		if err != nil {
-			fmt.Printf("Error making GET request: %v\n", err)
+			agentResultCollection[agent.Address] = err.Error()
+			continue
 		}
+
 		defer resp.Body.Close()
 
 		if err != nil {
-			fmt.Printf("Error collecting data from plugin %s: %v\n", name, err)
+			agentResultCollection[agent.Address] = err.Error()
 			continue
 		}
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Printf("Error reading response body: %v\n", err)
+			agentResultCollection[agent.Address] = err.Error()
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("Unexpected status code: %d\n", resp.StatusCode)
-			fmt.Printf("Response body: %s\n", string(body))
+			agentResultCollection[agent.Address] = string(body)
 		}
 
-		var results map[string]interface{}
 		if err := json.Unmarshal(body, &results); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
+			agentResultCollection[agent.Address] = err.Error()
 		}
 
 		agentResultCollection[agent.Address] = results
