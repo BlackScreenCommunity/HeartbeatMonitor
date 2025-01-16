@@ -17,6 +17,7 @@ type WebserverConfig struct {
 
 type AgentConfig struct {
 	Address string
+	Name    string
 }
 
 type ApplicationConfiguration struct {

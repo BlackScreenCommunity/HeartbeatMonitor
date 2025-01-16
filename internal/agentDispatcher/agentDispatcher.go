@@ -18,7 +18,7 @@ func GetMetricsFromAgents() map[string]interface{} {
 	agentResultCollection := make(map[string]interface{})
 
 	for _, agent := range agents {
-		agentResultCollection[agent.Address] = GetMetricsFromSingleAgent(agent)
+		agentResultCollection[agent.Name] = GetMetricsFromSingleAgent(agent)
 	}
 	return utils.MapDereference(agentResultCollection)
 }
