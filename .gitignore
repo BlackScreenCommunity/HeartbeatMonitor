@@ -25,4 +25,4 @@ go.work.sum
 .env
 
 /.vscode
-/HeartBeatMonitor-linux-amd64
+/Release
