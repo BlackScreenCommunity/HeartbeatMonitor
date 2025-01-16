@@ -2,55 +2,50 @@ package agentDispatcher
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/utils"
 )
 
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
-var agentsMetricsCollection = make(map[string]interface{})
 
 func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatcher.AgentConfig) {
 	agents = agentsConfigCollection
 }
 
-func CollectAll() map[string]interface{} {
-
+func GetMetricsFromAgents() map[string]interface{} {
 	agentResultCollection := make(map[string]interface{})
 
 	for _, agent := range agents {
-		var results map[string]interface{}
-
-		url := agent.Address + "/plugins/results"
-
-		resp, err := http.Get(url)
-		if err != nil {
-			agentResultCollection[agent.Address] = err.Error()
-			continue
-		}
-
-		defer resp.Body.Close()
-
-		if err != nil {
-			agentResultCollection[agent.Address] = err.Error()
-			continue
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			agentResultCollection[agent.Address] = err.Error()
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			agentResultCollection[agent.Address] = string(body)
-		}
-
-		if err := json.Unmarshal(body, &results); err != nil {
-			agentResultCollection[agent.Address] = err.Error()
-		}
-
-		agentResultCollection[agent.Address] = results
+		agentResultCollection[agent.Address] = GetMetricsFromSingleAgent(agent)
 	}
 	return utils.MapDereference(agentResultCollection)
+}
+
+func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentConfig) map[string]interface{} {
+	results := make(map[string]interface{})
+
+	resp, err := http.Get(agent.Address + "/plugins/results")
+	if err != nil {
+		results["Error"] = err.Error()
+		return results
+	}
+
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		results["Error"] = err.Error()
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		results["Error"] = string(body)
+	}
+
+	if err := json.Unmarshal(body, &results); err != nil {
+		results["Error"] = err.Error()
+	}
+
+	return results
 }
