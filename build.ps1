@@ -9,6 +9,7 @@ foreach ($target in $targets) {
     go build -o ./Release/$env:GOOS/$output
     Write-Host "Built: $output"
     Copy-Item -Recurse -Force ./templates ./Release/$env:GOOS/
-    Compress-Archive -Path ./Release/$env:GOOS\* -CompressionLevel Fastest -DestinationPath .\Release\$output.zip
+    Copy-Item -Force .\appsettings.json ./Release/$env:GOOS/
+    Compress-Archive -Force -Path ./Release/$env:GOOS\* -CompressionLevel Fastest -DestinationPath .\Release\$output.zip
     Remove-Item -Force -Recurse ./Release/$env:GOOS/
 }
