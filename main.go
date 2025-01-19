@@ -4,7 +4,7 @@ import (
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
-	webserver "project/internal/webServer"
+	"project/internal/webServer"
 )
 
 func main() {
@@ -16,5 +16,5 @@ func main() {
 	pluginDispatcher.InitializePlugins(applicationConfiguration.Plugins)
 	agentDispatcher.InitializePlugins(applicationConfiguration.Agents)
 
-	webserver.RunServer(applicationConfiguration.Webserver, applicationConfiguration.Server)
+	webServer.RunServer(applicationConfiguration.WebServer, applicationConfiguration.Server)
 }

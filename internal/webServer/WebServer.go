@@ -1,4 +1,4 @@
-package webserver
+package webServer
 
 import (
 	"encoding/json"
@@ -14,11 +14,11 @@ import (
 
 var ServerInfo = applicationConfigurationDispatcher.ServerInfo{}
 
-func RunServer(webserverConfig applicationConfigurationDispatcher.WebserverConfig, serverInfo applicationConfigurationDispatcher.ServerInfo) {
+func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfig, serverInfo applicationConfigurationDispatcher.ServerInfo) {
 	ServerInfo = serverInfo
 
 	InitEndpoints()
-	StartServer(webserverConfig)
+	StartServer(webServerConfig)
 }
 
 func InitEndpoints() {
@@ -34,7 +34,7 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 	responseWriter.Write([]byte(string(pluginResultCollection)))
 }
 
-func StartServer(config applicationConfigurationDispatcher.WebserverConfig) {
+func StartServer(config applicationConfigurationDispatcher.WebServerConfig) {
 	fmt.Println("Server is running on port " + strconv.Itoa(config.Port))
 	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
@@ -75,19 +75,21 @@ func getServerName() template.HTML {
 
 func renderList(data interface{}) template.HTML {
 	switch reflect.TypeOf(data).Kind() {
+
 	case reflect.Map:
-		html := "<ul>"
+		html := "<div class='widget'>"
 		for key, value := range data.(map[string]interface{}) {
-			html += "<li><strong>" + key + ":</strong> " + string(renderList(value)) + "</li>"
+			html += "<div class='widget-title'>" + key + ":</div> " + string(renderList(value)) + ""
 		}
-		html += "</ul>"
+		html += "</div>"
 		return template.HTML(html)
+
 	case reflect.Slice:
-		html := "<ul>"
+		html := "<div class='data_array'>"
 		for _, value := range data.([]interface{}) {
-			html += "<li>" + string(renderList(value)) + "</li>"
+			html += "<div class='data_array_element'>" + string(renderList(value)) + "</div>"
 		}
-		html += "</ul>"
+		html += "</div>"
 		return template.HTML(html)
 	default:
 		return template.HTML(template.HTMLEscapeString(fmt.Sprintf("%v", data)))

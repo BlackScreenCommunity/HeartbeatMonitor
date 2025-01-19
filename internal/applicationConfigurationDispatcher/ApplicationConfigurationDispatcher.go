@@ -11,7 +11,7 @@ type ServerInfo struct {
 	Name string
 }
 
-type WebserverConfig struct {
+type WebServerConfig struct {
 	Port int
 }
 
@@ -22,7 +22,7 @@ type AgentConfig struct {
 
 type ApplicationConfiguration struct {
 	Server    ServerInfo
-	Webserver WebserverConfig
+	WebServer WebServerConfig
 	Plugins   []pluginDispatcher.PluginConfig
 	Agents    []AgentConfig
 }

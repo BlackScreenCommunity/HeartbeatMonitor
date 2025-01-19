@@ -45,3 +45,26 @@ li:hover {
     font-weight: bold;
     margin-top: 10px;
 }
+
+.widget {
+    /* background-color: gray; */
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding-left: 2em;
+}
+
+.widget>.widget {
+    /* background-color: yellow; */
+    padding-top: 1em;
+}
+
+.widget > .widget > .widget {
+    /* background-color: red; */
+    flex-direction: row;
+}
+
+.widget-title {
+    font-weight: 700;
+    padding-left: 1.5em;
+}
