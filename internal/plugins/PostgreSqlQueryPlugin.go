@@ -10,11 +10,16 @@ import (
 
 var pluginName = "PostgreSqlQueryPlugin"
 
+type Query struct {
+	Name          string
+	QueryText     string
+	IsSingleValue bool
+}
+
 type PostgreSqlQueryPlugin struct {
-	ConnectionString string
-	Query            string
 	InstanceName     string
-	IsSingleValue    bool
+	ConnectionString string
+	Queries          []interface{}
 }
 
 func (plugin PostgreSqlQueryPlugin) Name() string {
@@ -24,28 +29,44 @@ func (plugin PostgreSqlQueryPlugin) Name() string {
 func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 	pluginName = plugin.InstanceName
 
+	results := make(map[string]interface{})
+
 	db, err := sql.Open("postgres", plugin.ConnectionString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 	defer db.Close()
 
-	rows, err := db.Query(plugin.Query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute query: %v", err)
-	}
-	defer rows.Close()
+	for _, query := range plugin.Queries {
+		data, ok := query.(map[string]interface{})
+		if !ok {
+			fmt.Println("Invalid data type")
+			return results, nil
+		}
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get columns: %v", err)
-	}
+		rows, err := db.Query(data["QueryText"].(string))
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute query: %v", err)
+		}
+		defer rows.Close()
 
-	results, err := plugin.ProcessData(rows, columns)
+		columns, err := rows.Columns()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get columns: %v", err)
+		}
+
+		queryResult, err := plugin.ProcessData(rows, columns, data["IsSingleValue"].(bool))
+		if err != nil {
+			results[data["Name"].(string)] = nil
+		}
+
+		results[data["Name"].(string)] = queryResult
+
+	}
 	return results, err
 }
 
-func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string) (map[string]interface{}, error) {
+func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string, IsSingleValue bool) (map[string]interface{}, error) {
 	results := make(map[string]interface{}, 0)
 	var rowNumber = 0
 
@@ -65,7 +86,7 @@ func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string
 			row[col] = values[i]
 		}
 
-		if plugin.IsSingleValue {
+		if IsSingleValue {
 			return row, nil
 		}
 
