@@ -92,6 +92,6 @@ func renderList(data interface{}) template.HTML {
 		html += "</div>"
 		return template.HTML(html)
 	default:
-		return template.HTML(template.HTMLEscapeString(fmt.Sprintf("%v", data)))
+		return template.HTML("<div class='widget-data'>" + template.HTMLEscapeString(fmt.Sprintf("%v", data)) + "</div>")
 	}
 }
