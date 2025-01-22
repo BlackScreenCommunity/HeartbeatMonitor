@@ -77,34 +77,46 @@ li:hover {
     background-color: var(--first-level-background-color);
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
     padding: 1em;
     align-items: baseline;
     border-radius: 1em;
+    border: solid 1px transparent;
 }
+
+body > .widget {
+    padding-top: 2em;
+}
+
+body > .widget > .widget-title{
+    color: var(--nord14);
+    min-width: 100%;
+    font-size: 3em;
+}
+
 
 .widget>.widget {
     background-color: var(--second-level-background-color);
     padding-top: 1em;
+    margin: 0.5em;
 }
 
 .widget > .widget > .widget {
     background-color: var(--third-level-background-color);
     flex-direction: row;
+    padding: 0em 1em;
 }
 
+.widget :hover {
+    border: solid 1px var(--nord12);
+} 
 
-.widget-title {
-    font-weight: 700;
-    font-size: 1.5em;
-    padding-left: 1.5em;
-    padding-top: 1.5em;
-    color: var(--node-title-color)
-}
 
-.widget-title + .widget > .widget-title {
+.widget > .widget :hover {
+    border: none;
+} 
+
+.widget-title  {
     font-size: 1em;
-    padding-top: 1em;
     color: var(--title-color)
 }
 

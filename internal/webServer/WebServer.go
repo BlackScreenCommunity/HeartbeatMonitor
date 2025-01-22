@@ -77,11 +77,14 @@ func renderList(data interface{}) template.HTML {
 	switch reflect.TypeOf(data).Kind() {
 
 	case reflect.Map:
-		html := "<div class='widget'>"
+		html := ""
+
 		for key, value := range data.(map[string]interface{}) {
-			html += "<div class='widget-title'>" + key + ":</div> " + string(renderList(value)) + ""
+			html += "<div class='widget'>"
+			html += "<div class='widget-title'>" + key + ":</div> "
+			html += string(renderList(value)) + ""
+			html += "</div>"
 		}
-		html += "</div>"
 		return template.HTML(html)
 
 	case reflect.Slice:
