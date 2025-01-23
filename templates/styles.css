@@ -123,3 +123,7 @@ body > .widget > .widget-title{
 .widget-data {
     padding-left: 0.5em;
 }
+
+.warning.warning > .widget {
+    border: 4px var(--nord11) solid;
+}

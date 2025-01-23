@@ -79,8 +79,22 @@ func renderList(data interface{}) template.HTML {
 	case reflect.Map:
 		html := ""
 
-		for key, value := range data.(map[string]interface{}) {
-			html += "<div class='widget'>"
+		dataMap := data.(map[string]interface{})
+
+		isWarning := false
+		value, exists := dataMap["isWarning"]
+		if exists {
+			isWarning = value.(bool)
+			delete(dataMap, "isWarning")
+		}
+
+		for key, value := range dataMap {
+			if !isWarning {
+				html += "<div class='widget'>"
+			} else {
+				html += "<div class='widget warning'>"
+			}
+			isWarning = false
 			html += "<div class='widget-title'>" + key + ":</div> "
 			html += string(renderList(value)) + ""
 			html += "</div>"
