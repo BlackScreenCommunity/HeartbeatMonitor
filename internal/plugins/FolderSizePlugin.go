@@ -8,6 +8,7 @@ import (
 
 type FolderSizePlugin struct {
 	PathToFolder string
+	WarningValue float64
 }
 
 func (p FolderSizePlugin) Name() string {
@@ -28,8 +29,12 @@ func (p FolderSizePlugin) Collect() (map[string]interface{}, error) {
 		return nil
 	})
 
-	return map[string]interface{}{
+	result := map[string]interface{}{
 		"path": p.PathToFolder,
 		"size": (math.Round(float64(totalSize)/1024/1024/1024) * 100) / 100,
-	}, err
+	}
+
+	result["isWarning"] = result["size"].(float64) > p.WarningValue
+
+	return result, err
 }
