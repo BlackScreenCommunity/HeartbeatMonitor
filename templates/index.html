@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeartBeat Monitor on {{ serverInfo }}</title>
     <link rel="stylesheet" href="/templates/styles.css">
+    <script src="/templates/jquery.js"></script>
 </head>
 <body>
     <h1>{{ serverInfo }}</h1>
     {{ renderList . }}
+    <script src="templates/scripts.js"></script>    
 </body>
 </html>

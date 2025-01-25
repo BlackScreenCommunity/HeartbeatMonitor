@@ -124,6 +124,10 @@ body > .widget > .widget-title{
     padding-left: 0.5em;
 }
 
-.warning.warning > .widget {
-    border: 4px var(--nord11) solid;
+.parent-warning {
+    border: solid 5px var(--nord11);
+}
+
+.parent-warning > .parent-warning {
+    border: none;
 }
