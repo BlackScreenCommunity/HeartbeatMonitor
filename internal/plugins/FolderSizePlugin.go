@@ -29,6 +29,13 @@ func (p FolderSizePlugin) Collect() (map[string]interface{}, error) {
 		return nil
 	})
 
+	if err != nil {
+		return map[string]interface{}{
+			"isWarning": true,
+			"Message":   "Path not found",
+		}, nil
+	}
+
 	result := map[string]interface{}{
 		"path": p.PathToFolder,
 		"size": (math.Round(float64(totalSize)/1024/1024/1024) * 100) / 100,
