@@ -11,6 +11,7 @@ import (
 
 type PluginConfig struct {
 	Name       string
+	Active     bool
 	Parameters map[string]interface{}
 }
 
@@ -24,13 +25,14 @@ func InitializePlugins(pluginsConfig []PluginConfig) {
 	}
 
 	for _, cfg := range pluginsConfig {
-		plugin, err := pluginFactory.CreatePlugin(cfg.Name, cfg.Parameters)
-		if err != nil {
-			fmt.Printf("Error creating plugin: %v\n", err)
-			continue
+		if cfg.Active {
+			plugin, err := pluginFactory.CreatePlugin(cfg.Name, cfg.Parameters)
+			if err != nil {
+				fmt.Printf("Error creating plugin: %v\n", err)
+				continue
+			}
+			RegisterPlugin(plugin)
 		}
-
-		RegisterPlugin(plugin)
 	}
 }
 
