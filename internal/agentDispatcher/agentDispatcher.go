@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/utils"
+	"time"
 )
 
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
@@ -26,7 +27,15 @@ func GetMetricsFromAgents() map[string]interface{} {
 func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentConfig) map[string]interface{} {
 	results := make(map[string]interface{})
 
-	resp, err := http.Get(agent.Address + "/plugins/results")
+	transport := &http.Transport{
+		ResponseHeaderTimeout: 30 * time.Second,
+	}
+
+	client := &http.Client{
+		Transport: transport,
+	}
+
+	resp, err := client.Get(agent.Address + "/plugins/results")
 	if err != nil {
 		results["Error"] = err.Error()
 		return results
