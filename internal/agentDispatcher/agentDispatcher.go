@@ -10,9 +10,11 @@ import (
 )
 
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
+var pollingTimeout = 30
 
-func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatcher.AgentConfig) {
+func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatcher.AgentConfig, agentsPollingTimeout int) {
 	agents = agentsConfigCollection
+	pollingTimeout = agentsPollingTimeout
 }
 
 func GetMetricsFromAgents() map[string]interface{} {
@@ -28,7 +30,7 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 	results := make(map[string]interface{})
 
 	transport := &http.Transport{
-		ResponseHeaderTimeout: 30 * time.Second,
+		ResponseHeaderTimeout: time.Duration(pollingTimeout) * time.Second,
 	}
 
 	client := &http.Client{

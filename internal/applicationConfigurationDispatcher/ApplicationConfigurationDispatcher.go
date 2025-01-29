@@ -12,7 +12,8 @@ type ServerInfo struct {
 }
 
 type WebServerConfig struct {
-	Port int
+	Port                int
+	AgentPollingTimeout int
 }
 
 type AgentConfig struct {

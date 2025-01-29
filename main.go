@@ -14,7 +14,7 @@ func main() {
 	}
 
 	pluginDispatcher.InitializePlugins(applicationConfiguration.Plugins)
-	agentDispatcher.InitializePlugins(applicationConfiguration.Agents)
+	agentDispatcher.InitializePlugins(applicationConfiguration.Agents, applicationConfiguration.WebServer.AgentPollingTimeout)
 
 	webServer.RunServer(applicationConfiguration.WebServer, applicationConfiguration.Server)
 }
