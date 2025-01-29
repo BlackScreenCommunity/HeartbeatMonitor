@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/utils"
+	"strconv"
 	"time"
 )
 
@@ -20,8 +21,8 @@ func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatch
 func GetMetricsFromAgents() map[string]interface{} {
 	agentResultCollection := make(map[string]interface{})
 
-	for _, agent := range agents {
-		agentResultCollection[agent.Name] = GetMetricsFromSingleAgent(agent)
+	for i, agent := range agents {
+		agentResultCollection[strconv.Itoa(i+1)+". "+agent.Name] = GetMetricsFromSingleAgent(agent)
 	}
 	return utils.MapDereference(agentResultCollection)
 }

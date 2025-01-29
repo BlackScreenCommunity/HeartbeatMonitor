@@ -52,7 +52,7 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	agentResultCollection := agentDispatcher.GetMetricsFromAgents()
 
 	totalResults := make(map[string]interface{})
-	totalResults[ServerInfo.Name] = data
+	totalResults["0. "+ServerInfo.Name] = data
 
 	for k, v := range agentResultCollection {
 		totalResults[k] = v
