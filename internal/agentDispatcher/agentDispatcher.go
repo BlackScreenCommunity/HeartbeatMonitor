@@ -19,11 +19,31 @@ func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatch
 }
 
 func GetMetricsFromAgents() map[string]interface{} {
+	resultsChannel := make(chan struct {
+		Key    string
+		Result map[string]interface{}
+	}, len(agents))
+
 	agentResultCollection := make(map[string]interface{})
 
 	for i, agent := range agents {
-		agentResultCollection[strconv.Itoa(i+1)+". "+agent.Name] = GetMetricsFromSingleAgent(agent)
+		go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
+			result := GetMetricsFromSingleAgent(agent)
+			resultsChannel <- struct {
+				Key    string
+				Result map[string]interface{}
+			}{
+				Key:    strconv.Itoa(i+1) + ". " + agent.Name,
+				Result: result,
+			}
+		}(i, agent)
 	}
+
+	for range agents {
+		res := <-resultsChannel
+		agentResultCollection[res.Key] = res.Result
+	}
+
 	return utils.MapDereference(agentResultCollection)
 }
 
