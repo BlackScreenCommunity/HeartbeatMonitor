@@ -8,7 +8,7 @@ import (
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
-	"reflect"
+	"project/internal/utils"
 	"strconv"
 )
 
@@ -25,6 +25,7 @@ func InitEndpoints() {
 	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
 	http.HandleFunc("/", IndexPageHandler)
 	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
+	http.HandleFunc("/events", sseHandler)
 }
 
 func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
@@ -42,24 +43,9 @@ func StartServer(config applicationConfigurationDispatcher.WebServerConfig) {
 }
 
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
-
-	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(pluginResultCollection), &data); err != nil {
-		panic(err)
-	}
-
-	agentResultCollection := agentDispatcher.GetMetricsFromAgents()
-
 	totalResults := make(map[string]interface{})
-	totalResults["0. "+ServerInfo.Name] = data
-
-	for k, v := range agentResultCollection {
-		totalResults[k] = v
-	}
 
 	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{
-		"renderList": renderList,
 		"serverInfo": getServerName,
 	}).ParseFiles("templates/index.html"))
 
@@ -69,46 +55,72 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getServerName() template.HTML {
-	return template.HTML(ServerInfo.Name)
+func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	responseWriter.Header().Set("Content-Type", "text/event-stream")
+	responseWriter.Header().Set("Cache-Control", "no-cache")
+	responseWriter.Header().Set("Connection", "keep-alive")
+
+	HandlePlugins(responseWriter)
+	HandleAgents(responseWriter)
 }
 
-func renderList(data interface{}) template.HTML {
-	switch reflect.TypeOf(data).Kind() {
-
-	case reflect.Map:
-		html := ""
-
-		dataMap := data.(map[string]interface{})
-
-		isWarning := false
-		value, exists := dataMap["isWarning"]
-		if exists {
-			isWarning = value.(bool)
-			delete(dataMap, "isWarning")
+func HandlePlugins(responseWriter http.ResponseWriter) {
+	for name, plugin := range pluginDispatcher.GetPlugins() {
+		data, err := plugin.Collect()
+		if err != nil {
+			fmt.Printf("Error collecting data from plugin %s: %v\n", name, err)
+			continue
 		}
 
-		for key, value := range dataMap {
-			if !isWarning {
-				html += "<div class='widget'>"
-			} else {
-				html += "<div class='widget warning'>"
-			}
-			isWarning = false
-			html += "<div class='widget-title'>" + key + ":</div> "
-			html += string(renderList(value)) + ""
-			html += "</div>"
+		type DataChunk struct {
+			PluginName string                 `json:"plugin_name"`
+			Data       map[string]interface{} `json:"data"`
 		}
-		return template.HTML(html)
 
-	case reflect.Slice:
-		html := "<div class='data_array'>"
-		for _, value := range data.([]interface{}) {
-			html += "<div class='data_array_element'>" + string(renderList(value)) + "</div>"
+		pluginData := DataChunk{
+			PluginName: plugin.Name(),
+			Data:       data,
 		}
-		html += "</div>"
-		return template.HTML(html)
-	default:
-		return template.HTML("<div class='widget-data'>" + template.HTMLEscapeString(fmt.Sprintf("%v", data)) + "</div>")
+
+		jsonData, _ := json.Marshal(pluginData)
+
+		fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		responseWriter.(http.Flusher).Flush()
+
 	}
+}
+
+func HandleAgents(responseWriter http.ResponseWriter) {
+	agents := agentDispatcher.GetAgents()
+	resultsChannel := make(chan struct {
+		Key    string
+		Result map[string]interface{}
+	}, len(agents))
+
+	for i, agent := range agents {
+		go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
+			result := agentDispatcher.GetMetricsFromSingleAgent(agent)
+			resultsChannel <- struct {
+				Key    string
+				Result map[string]interface{}
+			}{
+				Key:    strconv.Itoa(i+1) + ". " + agent.Name,
+				Result: result,
+			}
+		}(i, agent)
+	}
+
+	for range agents {
+		res := <-resultsChannel
+
+		jsonData, _ := json.Marshal(utils.MapDereference(res.Result))
+
+		fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		responseWriter.(http.Flusher).Flush()
+
+	}
+}
+
+func getServerName() template.HTML {
+	return template.HTML(ServerInfo.Name)
 }

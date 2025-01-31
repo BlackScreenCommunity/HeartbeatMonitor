@@ -89,3 +89,7 @@ func PrintPluginResult(pluginResultCollection map[string]interface{}) {
 		fmt.Println()
 	}
 }
+
+func GetPlugins() map[string]plugins.Plugin {
+	return registeredPlugins
+}

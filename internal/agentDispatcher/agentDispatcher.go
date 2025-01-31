@@ -81,3 +81,7 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 
 	return results
 }
+
+func GetAgents() []applicationConfigurationDispatcher.AgentConfig {
+	return agents
+}
