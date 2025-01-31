@@ -68,19 +68,43 @@ li:hover {
     background-color: #81a1c1;
 }
 
-.plugin-name {
+.agent-name {
+    font-size: x-large;
     font-weight: bold;
+    margin-top: 2em;
+}
+
+.agent-name ~ .widget > .widget-title {
+    font-size: large;
+    margin-top: 10px;
+}
+
+.plugin-name {
+    font-size: large;
     margin-top: 10px;
 }
 
 .widget {
     background-color: var(--first-level-background-color);
+    padding: 1em;
+    align-items: baseline;
+    border-radius: 1em;
+    border: solid 1px transparent;
+}
+
+.agent-data {
     display: flex;
     flex-wrap: wrap;
     padding: 1em;
     align-items: baseline;
     border-radius: 1em;
-    border: solid 1px transparent;
+    border: solid 1px var(--nord14);
+    /* background-color: var(--nord1) */
+}
+
+.agent-data > .widget {
+    width: 30%;
+    margin: 1em;
 }
 
 body > .widget {

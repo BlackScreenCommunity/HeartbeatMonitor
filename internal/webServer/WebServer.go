@@ -8,7 +8,6 @@ import (
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
-	"project/internal/utils"
 	"strconv"
 )
 
@@ -60,7 +59,6 @@ func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	responseWriter.Header().Set("Cache-Control", "no-cache")
 	responseWriter.Header().Set("Connection", "keep-alive")
 
-	HandlePlugins(responseWriter)
 	HandleAgents(responseWriter)
 }
 
@@ -110,10 +108,20 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 		}(i, agent)
 	}
 
+	type AgentDataChunk struct {
+		AgentName string                 `json:"agent_name"`
+		Data      map[string]interface{} `json:"data"`
+	}
+
 	for range agents {
 		res := <-resultsChannel
 
-		jsonData, _ := json.Marshal(utils.MapDereference(res.Result))
+		agentDataChunk := AgentDataChunk{
+			AgentName: res.Key,
+			Data:      res.Result,
+		}
+
+		jsonData, _ := json.Marshal(agentDataChunk)
 
 		fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
 		responseWriter.(http.Flusher).Flush()

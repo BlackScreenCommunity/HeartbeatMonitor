@@ -24,12 +24,23 @@ function processWarnings() {
 const eventSource = new EventSource("/events");
 
 function renderList(data) {
-    debugger;
+
     let html = "";
 
     if (typeof data === "object" && !Array.isArray(data)) { 
         let isWarning = data.hasOwnProperty("isWarning") ? data.isWarning : false;
         delete data["isWarning"];
+
+        
+        let agentName = data.hasOwnProperty("agent_name") ? data.agent_name : "";
+        if(agentName) {
+            data = data?.data;
+        }
+
+        if(agentName) {
+            html += `<div class='agent-name'> ${agentName} </div>`;
+            html += `<div class='agent-data'>`;
+        }
 
         let pluginName = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
         if(pluginName) {
@@ -48,7 +59,18 @@ function renderList(data) {
             html += renderList(data[key]);
             html += `</div>`;
         }
-        html += `</div>`;
+
+        if(pluginName) {
+            html += `</div>`;
+        }
+        if(agentName) {
+            html += `</div>`;
+        }
+
+        // if(agentName) {
+        //     html += `</div>`;
+        // }
+
     } else if (Array.isArray(data)) { 
         html += "<div class='data_array'>";
         data.forEach(value => {
