@@ -9,6 +9,7 @@ import (
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	"strconv"
+	"time"
 )
 
 var ServerInfo = applicationConfigurationDispatcher.ServerInfo{}
@@ -91,26 +92,32 @@ func HandlePlugins(responseWriter http.ResponseWriter) {
 func HandleAgents(responseWriter http.ResponseWriter) {
 	agents := agentDispatcher.GetAgents()
 	resultsChannel := make(chan struct {
-		Key    string
-		Result map[string]interface{}
+		Key      string
+		Result   map[string]interface{}
+		Duration float64
 	}, len(agents))
 
 	for i, agent := range agents {
 		go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
+			start := time.Now()
 			result := agentDispatcher.GetMetricsFromSingleAgent(agent)
 			resultsChannel <- struct {
-				Key    string
-				Result map[string]interface{}
+				Key      string
+				Result   map[string]interface{}
+				Duration float64
 			}{
-				Key:    strconv.Itoa(i+1) + ". " + agent.Name,
-				Result: result,
+				Key:      strconv.Itoa(i+1) + ". " + agent.Name,
+				Result:   result,
+				Duration: time.Duration(time.Since(start)).Seconds(),
 			}
 		}(i, agent)
+
 	}
 
 	type AgentDataChunk struct {
 		AgentName string                 `json:"agent_name"`
 		Data      map[string]interface{} `json:"data"`
+		Duration  float64                `json:"duration"`
 	}
 
 	for range agents {
@@ -119,6 +126,7 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 		agentDataChunk := AgentDataChunk{
 			AgentName: res.Key,
 			Data:      res.Result,
+			Duration:  res.Duration,
 		}
 
 		jsonData, _ := json.Marshal(agentDataChunk)

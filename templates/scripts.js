@@ -28,17 +28,20 @@ function renderList(data) {
     let html = "";
 
     if (typeof data === "object" && !Array.isArray(data)) { 
+        let duration = 0;
         let isWarning = data.hasOwnProperty("isWarning") ? data.isWarning : false;
         delete data["isWarning"];
 
         
         let agentName = data.hasOwnProperty("agent_name") ? data.agent_name : "";
         if(agentName) {
+            duration = data?.duration;
             data = data?.data;
         }
 
         if(agentName) {
             html += `<div class='agent-name'> ${agentName} </div>`;
+            html += `<div class='agent-duration'> ${duration} </div>`;
             html += `<div class='agent-data'>`;
         }
 
