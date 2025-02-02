@@ -86,6 +86,8 @@ func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string
 			row[col] = values[i]
 		}
 
+		convertByteArraysInMapToStrings(row)
+
 		if IsSingleValue {
 			return row, nil
 		}
@@ -94,4 +96,12 @@ func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string
 		rowNumber++
 	}
 	return results, nil
+}
+
+func convertByteArraysInMapToStrings(row map[string]interface{}) {
+	for key, value := range row {
+		if v, ok := value.([]uint8); ok {
+			row[key] = string(v)
+		}
+	}
 }
