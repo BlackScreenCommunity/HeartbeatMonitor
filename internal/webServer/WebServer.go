@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"math"
 	"net/http"
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
@@ -108,7 +109,7 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 			}{
 				Key:      strconv.Itoa(i+1) + ". " + agent.Name,
 				Result:   result,
-				Duration: time.Duration(time.Since(start)).Seconds(),
+				Duration: math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
 			}
 		}(i, agent)
 

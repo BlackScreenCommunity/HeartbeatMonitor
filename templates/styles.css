@@ -72,6 +72,9 @@ li:hover {
     font-size: x-large;
     font-weight: bold;
     margin-top: 2em;
+    margin-bottom: 1em;
+    display: flex;
+    align-items: center;
 }
 
 .agent-name ~ .widget > .widget-title {
@@ -99,7 +102,6 @@ li:hover {
     align-items: baseline;
     border-radius: 1em;
     border: solid 1px var(--nord14);
-    /* background-color: var(--nord1) */
 }
 
 .agent-data > .widget {
@@ -116,7 +118,6 @@ body > .widget > .widget-title{
     min-width: 100%;
     font-size: 3em;
 }
-
 
 .widget>.widget {
     background-color: var(--second-level-background-color);
@@ -154,4 +155,13 @@ body > .widget > .widget-title{
 
 .parent-warning > .parent-warning {
     border: none;
+}
+
+.timer {
+    background-image: url(images/timer.svg);
+    background-repeat: no-repeat;
+    height: 1.3em;
+    margin-left: 1em;
+    padding-left: 1.6em;
+    font-size: medium;
 }

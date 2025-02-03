@@ -40,9 +40,11 @@ function renderList(data) {
         }
 
         if(agentName) {
-            html += `<div class='agent-name'> ${agentName} </div>`;
-            html += `<div class='agent-duration'> ${duration} </div>`;
+            html += `<div class='agent-name'> ${agentName}`;
+            html += `<div class='timer agent-duration'> Loading time ${duration} seconds </div>`;
+            html += `</div>`
             html += `<div class='agent-data'>`;
+
         }
 
         let pluginName = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
