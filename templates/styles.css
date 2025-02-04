@@ -16,56 +16,21 @@
     --nord14: #a3be8c;
     --nord15: #b48ead;
 
-    --background-color: var(--nord3);
     --first-level-background-color: var(--nord3);
     --second-level-background-color: var(--nord2);
     --third-level-background-color: var(--nord1);
-    --primary-color: var(--nord4);
+    --default-font-color: var(--nord4);
     --title-color: var(--nord8);
-    --node-title-color: var(--nord14);
+    --positive-accent-color: var(--nord14);
+    --nefgative-accent-color: var(--nord11);
 }
 
 body {
     font-family: Arial, sans-serif;
-    color: var(--primary-color);
-    background-color: var(--background-color);
+    color: var(--default-font-color);
+    background-color: var( --first-level-background-color);
     line-height: 1.6;
     padding: 10px;
-}
-
-ul ul, ol ul, ul ol, ol ol {
-    background-color: #d8dee9;
-    border: 1px solid #bbb;
-    margin-left: 1em;
-    border-radius: 5px;
-}
-
-ul ul ul, ol ul ul, ul ol ul, ol ol ul {
-    background-color: #d8dee9;
-    border-left: 3px solid #81a1c1;
-}
-
-ul {
-    list-style-type: none;
-    padding-left: 20px;
-}
-
-li {
-    margin: 5px 0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 1em;
-    text-indent: 3em;
-}
-
-li > strong {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-li:hover {
-    background-color: #81a1c1;
 }
 
 .agent-name {
@@ -101,7 +66,7 @@ li:hover {
     padding: 1em;
     align-items: baseline;
     border-radius: 1em;
-    border: solid 1px var(--nord14);
+    border: solid 1px var(--positive-accent-color);
 }
 
 .agent-data > .widget {
@@ -131,11 +96,6 @@ body > .widget > .widget-title{
     padding: 0em 1em;
 }
 
-.widget :hover {
-    border: solid 1px var(--nord12);
-} 
-
-
 .widget > .widget :hover {
     border: none;
 } 
@@ -150,7 +110,7 @@ body > .widget > .widget-title{
 }
 
 .parent-warning {
-    border: solid 5px var(--nord11);
+    border: solid 5px var(--negative-accent-color);
 }
 
 .parent-warning > .parent-warning {
