@@ -9,16 +9,17 @@ import (
 type FolderSizePlugin struct {
 	PathToFolder string
 	WarningValue float64
+	InstanceName string
 }
 
-func (p FolderSizePlugin) Name() string {
-	return "FolderSizePlugin"
+func (ppluginConfig FolderSizePlugin) Name() string {
+	return ppluginConfig.InstanceName
 }
 
-func (p FolderSizePlugin) Collect() (map[string]interface{}, error) {
+func (pluginConfig FolderSizePlugin) Collect() (map[string]interface{}, error) {
 	var totalSize int64
 
-	err := filepath.Walk(p.PathToFolder, func(_ string, info os.FileInfo, err error) error {
+	err := filepath.Walk(pluginConfig.PathToFolder, func(_ string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -37,11 +38,11 @@ func (p FolderSizePlugin) Collect() (map[string]interface{}, error) {
 	}
 
 	result := map[string]interface{}{
-		"path": p.PathToFolder,
+		"path": pluginConfig.PathToFolder,
 		"size": (math.Round(float64(totalSize)/1024/1024/1024) * 100) / 100,
 	}
 
-	result["isWarning"] = result["size"].(float64) > p.WarningValue
+	result["isWarning"] = result["size"].(float64) > pluginConfig.WarningValue
 
 	return result, err
 }
