@@ -1,9 +1,11 @@
 package plugins
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strconv"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -13,6 +15,7 @@ var pluginName = "PostgreSqlQueryPlugin"
 type Query struct {
 	Name          string
 	QueryText     string
+	QueryTimeout  float64
 	IsSingleValue bool
 }
 
@@ -44,7 +47,10 @@ func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 			return results, nil
 		}
 
-		rows, err := db.Query(data["QueryText"].(string))
+		queryContext, cancel := context.WithTimeout(context.Background(), time.Duration(data["QueryTimeout"].(float64))*time.Second)
+		defer cancel()
+
+		rows, err := db.QueryContext(queryContext, data["QueryText"].(string))
 		if err != nil {
 			return nil, fmt.Errorf("failed to execute query: %v", err)
 		}
