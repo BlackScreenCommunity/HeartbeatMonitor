@@ -26,7 +26,7 @@
 }
 body {
     font-family: Arial, sans-serif;
-    background-color: #1d1f21;
+    background-color: var(--first-level-background-color);
     color: white;
     margin: 0;
     padding: 0;
@@ -39,7 +39,7 @@ body {
 }
 
 .widget {
-    background-color: #2b2e31;
+    background-color: var(--second-level-background-color);
     padding: 15px;
     border-radius: 5px;
     display: flex;
@@ -60,7 +60,7 @@ body {
 .widget-title {
     font-weight: bold;
     margin-bottom: 5px;
-    color: #61dafb;
+    color: var(--title-color);
 }
 
 .widget-data {
@@ -68,9 +68,15 @@ body {
     font-weight: bold;
 }
 
-.widget.warning {
-    background-color: #ff5722;
+.parent-warning {
+    border: solid, 0.5em, var(--nefgative-accent-color)
 }
+
+
+.parent-warning > .parent-warning {
+    border: none;
+}
+
 
 .agent-name {
     grid-column: 1 / -1;     font-size: 18px;
