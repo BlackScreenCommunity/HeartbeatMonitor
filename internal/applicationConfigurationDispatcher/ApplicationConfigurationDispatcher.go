@@ -7,20 +7,25 @@ import (
 	"project/internal/pluginDispatcher"
 )
 
+// Defines the local agent name
 type ServerInfo struct {
 	Name string
 }
 
+// Parameters for the web interface 
+// and network interaction with external agents
 type WebServerConfig struct {
 	Port                int
 	AgentPollingTimeout int
 }
 
+// Remote agent parameters
 type AgentConfig struct {
 	Address string
 	Name    string
 }
 
+// Overall set of application parameters
 type ApplicationConfiguration struct {
 	Server    ServerInfo
 	WebServer WebServerConfig
