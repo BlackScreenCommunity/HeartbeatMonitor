@@ -12,7 +12,7 @@ type ServerInfo struct {
 	Name string
 }
 
-// Parameters for the web interface 
+// Parameters for the web interface
 // and network interaction with external agents
 type WebServerConfig struct {
 	Port                int
@@ -33,6 +33,8 @@ type ApplicationConfiguration struct {
 	Agents    []AgentConfig
 }
 
+// Reads application's configuration
+// from appsettings.json
 func GetConfigFromFile() (ApplicationConfiguration, bool) {
 	pluginsConfig, err := loadConfigFromFile()
 	if err != nil {
