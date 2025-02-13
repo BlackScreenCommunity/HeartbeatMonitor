@@ -13,11 +13,13 @@ import (
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
 var pollingTimeout = 30
 
+// TODO Rename function
 func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatcher.AgentConfig, agentsPollingTimeout int) {
 	agents = agentsConfigCollection
 	pollingTimeout = agentsPollingTimeout
 }
 
+// Gets metric data from a collection of agents
 func GetMetricsFromAgents() map[string]interface{} {
 	resultsChannel := make(chan struct {
 		Key    string
@@ -47,6 +49,7 @@ func GetMetricsFromAgents() map[string]interface{} {
 	return utils.MapDereference(agentResultCollection)
 }
 
+// Fetchs data from an external agent via API
 func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentConfig) map[string]interface{} {
 	results := make(map[string]interface{})
 
@@ -82,6 +85,8 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 	return results
 }
 
+//  Provides an interface for 
+//accessing the list of registered agents
 func GetAgents() []applicationConfigurationDispatcher.AgentConfig {
 	return agents
 }
