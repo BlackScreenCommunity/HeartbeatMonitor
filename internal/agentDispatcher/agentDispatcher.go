@@ -10,7 +10,13 @@ import (
 	"time"
 )
 
+// Collection of registered agents
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
+
+// The default timeout for waiting
+// for a response from the agent 
+// Can be overridden in the agent's 
+// configuration in appsettings.json
 var pollingTimeout = 30
 
 // TODO Rename function
