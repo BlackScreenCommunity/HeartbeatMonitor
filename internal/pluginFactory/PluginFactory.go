@@ -7,6 +7,7 @@ import (
 	"project/internal/plugins"
 )
 
+// Registers all available plugins
 func init() {
 	RegisterPluginType("VersionPlugin", func() plugins.Plugin { return &plugins.VersionPlugin{} })
 	RegisterPluginType("HardDriveFreeSpacePlugin", func() plugins.Plugin { return &plugins.HardDriveFreeSpacePlugin{} })
@@ -15,8 +16,10 @@ func init() {
 	RegisterPluginType("ServerTimePlugin", func() plugins.Plugin { return &plugins.ServerTimePlugin{} })
 }
 
+// Collection of registered plugins
 var registeredPlugins = make(map[string]func() plugins.Plugin)
 
+// TODO rename function
 func RegisterPluginType(name string, constructor func() plugins.Plugin) {
 	registeredPlugins[name] = constructor
 }
