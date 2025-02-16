@@ -15,6 +15,7 @@ type PluginConfig struct {
 	Parameters map[string]interface{}
 }
 
+// Collection of registered plugins for these agent
 var registeredPlugins = make(map[string]plugins.Plugin)
 
 func InitializePlugins(pluginsConfig []PluginConfig) {
@@ -48,6 +49,7 @@ func RegisterPlugin(p plugins.Plugin) {
 	registeredPlugins[pluginNumber+"_"+p.Name()] = p
 }
 
+// Gets plugins metrics
 func CollectAll() map[string]interface{} {
 
 	pluginResultCollection := make(map[string]interface{})
@@ -69,6 +71,8 @@ func CollectAll() map[string]interface{} {
 	return utils.MapDereference(pluginResultCollection)
 }
 
+// Returns metrics from all plugins 
+// in JSON format
 func GetPluginsJsonData() string {
 	jsonData, err := json.MarshalIndent(CollectAll(), "", "  ")
 
