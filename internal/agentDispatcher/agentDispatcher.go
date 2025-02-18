@@ -13,8 +13,8 @@ import (
 var agents = make([]applicationConfigurationDispatcher.AgentConfig, 0)
 
 // The default timeout for waiting
-// for a response from the agent 
-// Can be overridden in the agent's 
+// for a response from the agent
+// Can be overridden in the agent's
 // configuration in appsettings.json
 var pollingTimeout = 30
 
@@ -90,8 +90,9 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 	return results
 }
 
-//  Provides an interface for 
-//accessing the list of registered agents
+//	Provides an interface for
+//
+// accessing the list of registered agents
 func GetAgents() []applicationConfigurationDispatcher.AgentConfig {
 	return agents
 }

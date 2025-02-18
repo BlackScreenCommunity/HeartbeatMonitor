@@ -70,8 +70,7 @@ func CollectAll() map[string]interface{} {
 	return pluginResultCollection
 }
 
-// Returns metrics from all plugins 
-// in JSON format
+// Returns metrics from all plugins in JSON format
 func GetPluginsJsonData() string {
 	jsonData, err := json.MarshalIndent(CollectAll(), "", "  ")
 
@@ -80,17 +79,6 @@ func GetPluginsJsonData() string {
 	}
 
 	return string(jsonData)
-}
-
-// TODO Поправить вывод в консоль
-func PrintPluginResult(pluginResultCollection map[string]interface{}) {
-	for pluginResult := range pluginResultCollection {
-		// fmt.Printf("=== %s ===\n", plugin.Name())
-		for key, value := range pluginResult {
-			fmt.Printf("%-15s: %v\n", key, value)
-		}
-		fmt.Println()
-	}
 }
 
 func GetPlugins() map[string]plugins.Plugin {
