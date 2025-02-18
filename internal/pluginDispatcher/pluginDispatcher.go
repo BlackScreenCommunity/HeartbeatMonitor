@@ -6,7 +6,6 @@ import (
 
 	"project/internal/pluginFactory"
 	"project/internal/plugins"
-	"project/internal/utils"
 )
 
 type PluginConfig struct {
@@ -68,7 +67,7 @@ func CollectAll() map[string]interface{} {
 			pluginResultCollection[plugin.Name()] = data
 		}
 	}
-	return utils.MapDereference(pluginResultCollection)
+	return pluginResultCollection
 }
 
 // Returns metrics from all plugins 

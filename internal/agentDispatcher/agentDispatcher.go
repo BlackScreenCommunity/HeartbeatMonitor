@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
-	"project/internal/utils"
 	"strconv"
 	"time"
 )
@@ -52,7 +51,7 @@ func GetMetricsFromAgents() map[string]interface{} {
 		agentResultCollection[res.Key] = res.Result
 	}
 
-	return utils.MapDereference(agentResultCollection)
+	return agentResultCollection
 }
 
 // Fetchs data from an external agent via API
