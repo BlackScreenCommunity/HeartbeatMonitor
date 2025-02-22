@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -33,6 +34,7 @@ func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 	pluginName = plugin.InstanceName
 
 	results := make(map[string]interface{})
+	results["Type"] = reflect.TypeOf(plugin).Name()
 
 	db, err := sql.Open("postgres", plugin.ConnectionString)
 	if err != nil {
