@@ -6,16 +6,23 @@ import (
 	"path/filepath"
 )
 
+// FolderSizePlugin is a plugin for calculating the total size of files in the specified directory.
+// - PathToFolder: path to the directory to scan.
+// - WarningValue: threshold value in GB; if exceeded, the isWarning flag is set.
+// - InstanceName: name of the current plugin instance.
 type FolderSizePlugin struct {
 	PathToFolder string
 	WarningValue float64
 	InstanceName string
 }
 
-func (ppluginConfig FolderSizePlugin) Name() string {
-	return ppluginConfig.InstanceName
+// Name returns the name of the current plugin instance.
+func (pluginConfig FolderSizePlugin) Name() string {
+	return pluginConfig.InstanceName
 }
 
+// Calculates the total size of the folder
+// Set the 'IsWarning' flag when the total size is bigger than the WarningValue
 func (pluginConfig FolderSizePlugin) Collect() (map[string]interface{}, error) {
 	var totalSize int64
 
