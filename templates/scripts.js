@@ -57,12 +57,19 @@ function renderList(data) {
             html += `<div class='plugin-name'> ${pluginName} </div>`;
         }
 
+        if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
+        {
+            data = data[Object.keys(data)[0]];
+            html += renderList(data);
+        }
+        else {
         for (let key in data) {
             let widgetClass = isWarning ? "widget warning" : "widget";
             html += `<div class='${widgetClass}'>`;
             html += `<div class='widget-title'>${key}:</div>`;
             html += renderList(data[key]);
             html += `</div>`;
+            }
         }
 
         if(pluginName) {
