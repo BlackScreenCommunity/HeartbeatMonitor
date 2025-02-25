@@ -48,6 +48,12 @@ function renderList(data) {
         }
 
         let pluginName = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
+        let pluginType = data.hasOwnProperty("Type") ? data.Type : "";
+
+        if(pluginType) {
+            delete data["Type"];
+        }
+
         if(pluginName) {
             data = data?.data;
         }
@@ -57,18 +63,22 @@ function renderList(data) {
             html += `<div class='plugin-name'> ${pluginName} </div>`;
         }
 
-        if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
-        {
-            data = data[Object.keys(data)[0]];
-            html += renderList(data);
-        }
+        
         else {
-        for (let key in data) {
-            let widgetClass = isWarning ? "widget warning" : "widget";
-            html += `<div class='${widgetClass}'>`;
-            html += `<div class='widget-title'>${key}:</div>`;
-            html += renderList(data[key]);
-            html += `</div>`;
+            for (let key in data) {
+                let widgetClass = isWarning ? "widget warning" : "widget";
+                widgetClass += " " + pluginType
+                html += `<div class='${widgetClass}'>`;
+                html += `<div class='widget-title'>${key}:</div>`;
+
+                if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
+                {
+                    data = data[Object.keys(data)[0]];
+                    html += renderList(data);
+                } else {
+                    html += renderList(data[key]);
+                }
+                html += `</div>`;
             }
         }
 
