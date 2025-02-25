@@ -1,11 +1,15 @@
 package webServer
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"math"
 	"net/http"
+	"os"
+	"path/filepath"
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
@@ -22,11 +26,13 @@ func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfi
 	StartServer(webServerConfig)
 }
 
+// Defines enpoint handlers
 func InitEndpoints() {
 	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
 	http.HandleFunc("/", IndexPageHandler)
 	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
 	http.HandleFunc("/events", sseHandler)
+	http.HandleFunc("/styles.css", serveMergedCSS)
 }
 
 func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
@@ -140,4 +146,40 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 
 func getServerName() template.HTML {
 	return template.HTML(ServerInfo.Name)
+}
+
+func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
+	css, err := mergeCSSFiles(".")
+	if err != nil {
+		http.Error(w, "Ошибка загрузки CSS", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/css")
+	w.Write(css)
+}
+
+func mergeCSSFiles(dir string) ([]byte, error) {
+	var buffer bytes.Buffer
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".css" {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			_, err = io.Copy(&buffer, file)
+			if err != nil {
+				return err
+			}
+			buffer.WriteString("\n")
+		}
+		return nil
+	})
+
+	return buffer.Bytes(), err
 }
