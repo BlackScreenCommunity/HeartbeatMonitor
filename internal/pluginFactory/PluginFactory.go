@@ -5,13 +5,14 @@ import (
 	"reflect"
 
 	"project/internal/plugins"
+	postgreSqlQueryPlugin "project/internal/plugins/PostgreSqlQueryPluginDirectory"
 )
 
 // Registers all available plugins
 func init() {
 	registeredPlugins["VersionPlugin"] = func() plugins.Plugin { return &plugins.VersionPlugin{} }
 	registeredPlugins["HardDriveFreeSpacePlugin"] = func() plugins.Plugin { return &plugins.HardDriveFreeSpacePlugin{} }
-	registeredPlugins["PostgreSqlQueryPlugin"] = func() plugins.Plugin { return &plugins.PostgreSqlQueryPlugin{} }
+	registeredPlugins["PostgreSqlQueryPlugin"] = func() plugins.Plugin { return &postgreSqlQueryPlugin.PostgreSqlQueryPlugin{} }
 	registeredPlugins["FolderSizePlugin"] = func() plugins.Plugin { return &plugins.FolderSizePlugin{} }
 	registeredPlugins["ServerTimePlugin"] = func() plugins.Plugin { return &plugins.ServerTimePlugin{} }
 }
