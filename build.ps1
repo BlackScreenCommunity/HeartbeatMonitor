@@ -23,10 +23,14 @@ function Copy-FilesByExtension {
         | Get-ChildItem -File -Filter $fileExtension -Recurse  | ForEach-Object {
 
         $filePath = (Resolve-Path $_.FullName).Path
-        
+        $directoryName = (Get-Item $filePath).Directory.Name
+        $fileName = (Get-Item $filePath).Name
+        $newFileName = $directoryName + "." + $fileName
+        $newFilePath = [System.IO.Path]::Combine($destinationFolder, $newFileName)
+
         # Check if the file is NOT already in the destination folder
         if ($filePath -notlike "$destinationFolder\*") {
-            Copy-Item -Path $filePath -Destination $destinationFolder -Force
+            Copy-Item -Path $filePath -Destination $newFilePath -Force
         }
     }
 }
