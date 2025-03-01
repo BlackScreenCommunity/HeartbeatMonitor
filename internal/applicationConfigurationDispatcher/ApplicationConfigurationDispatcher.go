@@ -21,8 +21,9 @@ type WebServerConfig struct {
 
 // Remote agent parameters
 type AgentConfig struct {
-	Address string
-	Name    string
+	Address  string
+	Name     string
+	IsActive bool
 }
 
 // Overall set of application parameters
@@ -44,8 +45,8 @@ func GetConfigFromFile() (ApplicationConfiguration, bool) {
 	return pluginsConfig, false
 }
 
-// Handles operations with file. 
-// Tries to search and decode JSON object to 
+// Handles operations with file.
+// Tries to search and decode JSON object to
 // Application Configuration
 func loadConfigFromFile() (ApplicationConfiguration, error) {
 	file, err := os.Open("appsettings.json")

@@ -34,16 +34,18 @@ func GetMetricsFromAgents() map[string]interface{} {
 	agentResultCollection := make(map[string]interface{})
 
 	for i, agent := range agents {
-		go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
-			result := GetMetricsFromSingleAgent(agent)
-			resultsChannel <- struct {
-				Key    string
-				Result map[string]interface{}
-			}{
-				Key:    strconv.Itoa(i+1) + ". " + agent.Name,
-				Result: result,
-			}
-		}(i, agent)
+		if agent.IsActive {
+			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
+				result := GetMetricsFromSingleAgent(agent)
+				resultsChannel <- struct {
+					Key    string
+					Result map[string]interface{}
+				}{
+					Key:    strconv.Itoa(i+1) + ". " + agent.Name,
+					Result: result,
+				}
+			}(i, agent)
+		}
 	}
 
 	for range agents {

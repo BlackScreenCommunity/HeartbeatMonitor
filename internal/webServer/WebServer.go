@@ -105,20 +105,21 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 	}, len(agents))
 
 	for i, agent := range agents {
-		go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
-			start := time.Now()
-			result := agentDispatcher.GetMetricsFromSingleAgent(agent)
-			resultsChannel <- struct {
-				Key      string
-				Result   map[string]interface{}
-				Duration float64
-			}{
-				Key:      strconv.Itoa(i+1) + ". " + agent.Name,
-				Result:   result,
-				Duration: math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
-			}
-		}(i, agent)
-
+		if agent.IsActive {
+			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
+				start := time.Now()
+				result := agentDispatcher.GetMetricsFromSingleAgent(agent)
+				resultsChannel <- struct {
+					Key      string
+					Result   map[string]interface{}
+					Duration float64
+				}{
+					Key:      strconv.Itoa(i+1) + ". " + agent.Name,
+					Result:   result,
+					Duration: math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
+				}
+			}(i, agent)
+		}
 	}
 
 	type AgentDataChunk struct {
