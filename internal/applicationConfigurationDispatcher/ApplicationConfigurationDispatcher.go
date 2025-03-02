@@ -9,7 +9,8 @@ import (
 
 // Defines the local agent name
 type ServerInfo struct {
-	Name string
+	Name      string
+	AuthToken string
 }
 
 // Parameters for the web interface

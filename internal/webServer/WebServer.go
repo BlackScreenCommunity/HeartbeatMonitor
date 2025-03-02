@@ -2,6 +2,7 @@ package webServer
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -14,6 +15,7 @@ import (
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -28,7 +30,7 @@ func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfi
 
 // Defines enpoint handlers
 func InitEndpoints() {
-	http.HandleFunc("/plugins/results", GetPluginResultsHandler)
+	http.HandleFunc("/plugins/results", basicAuthMiddleware(GetPluginResultsHandler))
 	http.HandleFunc("/", IndexPageHandler)
 	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
 	http.HandleFunc("/events", sseHandler)
@@ -183,4 +185,37 @@ func mergeCSSFiles(dir string) ([]byte, error) {
 	})
 
 	return buffer.Bytes(), err
+}
+
+// Basic auth implementation for endpoints
+func basicAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Check header format
+		authParts := strings.SplitN(authHeader, " ", 2)
+		if len(authParts) != 2 || authParts[0] != "Basic" {
+			http.Error(w, "Invalid authorization format", http.StatusBadRequest)
+			return
+		}
+
+		requestAuthToken, err := base64.StdEncoding.DecodeString(authParts[1])
+		if err != nil {
+			http.Error(w, "Invalid base64 encoding", http.StatusBadRequest)
+			return
+		}
+
+		if string(requestAuthToken) != ServerInfo.AuthToken {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next(w, r)
+	}
 }
