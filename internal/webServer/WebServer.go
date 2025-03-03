@@ -204,13 +204,14 @@ func basicAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		requestAuthToken, err := base64.StdEncoding.DecodeString(authParts[1])
+		decoded, err := base64.StdEncoding.DecodeString(authParts[1])
 		if err != nil {
 			http.Error(w, "Invalid base64 encoding", http.StatusBadRequest)
 			return
 		}
 
-		if string(requestAuthToken) != ServerInfo.AuthToken {
+		credentials := strings.SplitN(string(decoded), ":", 2)
+		if len(credentials) != 2 || credentials[0] != ServerInfo.Login || credentials[1] != ServerInfo.Password {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
