@@ -68,12 +68,18 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 		Transport: transport,
 	}
 
-	resp, err := client.Get(agent.Address + "/plugins/results")
+	req, err := http.NewRequest("GET", agent.Address+"/plugins/results", nil)
 	if err != nil {
 		results["Error"] = err.Error()
 		return results
 	}
+	req.SetBasicAuth(agent.Login, agent.Password)
 
+	resp, err := client.Do(req)
+	if err != nil {
+		results["Error"] = err.Error()
+		return results
+	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)

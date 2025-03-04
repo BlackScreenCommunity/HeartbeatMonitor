@@ -26,6 +26,8 @@ type AgentConfig struct {
 	Address  string
 	Name     string
 	IsActive bool
+	Login    string
+	Password string
 }
 
 // Overall set of application parameters
