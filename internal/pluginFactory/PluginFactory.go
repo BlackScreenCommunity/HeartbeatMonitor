@@ -15,6 +15,7 @@ func init() {
 	registeredPlugins["PostgreSqlQueryPlugin"] = func() plugins.Plugin { return &postgreSqlQueryPlugin.PostgreSqlQueryPlugin{} }
 	registeredPlugins["FolderSizePlugin"] = func() plugins.Plugin { return &plugins.FolderSizePlugin{} }
 	registeredPlugins["ServerTimePlugin"] = func() plugins.Plugin { return &plugins.ServerTimePlugin{} }
+	registeredPlugins["ServiceStatusPlugin"] = func() plugins.Plugin { return &plugins.ServiceStatusPlugin{} }
 }
 
 // Collection of registered plugins
