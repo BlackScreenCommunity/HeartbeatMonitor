@@ -1,3 +1,11 @@
-.widget .PostgreSqlQueryPlugin {
-    border: 1px solid var(--nord14);
+.PostgreSqlQueryPlugin > .widget {
+    padding: 0px;
+    flex-direction: row;
+    font-weight: normal;
+}
+  
+.PostgreSqlQueryPlugin > .widget * {
+    font-weight: normal;
+    font-size: 16px;
+    padding: 3px;
 }
