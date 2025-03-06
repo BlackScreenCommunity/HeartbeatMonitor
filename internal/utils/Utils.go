@@ -1,13 +1,10 @@
 package utils
 
+import "slices"
+
 // Checks if a string exists in an array of strings.
 func IsArrayContainString(slice []string, str string) bool {
-	for _, v := range slice {
-		if v == str {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, str)
 }
 
 func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
