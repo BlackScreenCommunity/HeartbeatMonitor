@@ -10,17 +10,31 @@ HeartbeatMonitor — это простая система мониторинга
 - Сбор данных, полученных путем выполнения SQL-запросов в PostgreSQL;
 - Серверное время.
 
+## Установка приложения
+
+``` bash
+sudo apt update
+sudo apt install musl musl-dev musl-tools
+
+wget ftp://185.246.118.224/HeartBeatMonitor-linux-amd64.zip -O HeartBeatMonitor-linux-amd64.zip
+sudo unzip -o HeartBeatMonitor-linux-amd64.zip -d /srv/HBM \
+sudo chmod +x /srv/HBM/HeartBeatMonitor-linux-amd64
+```
+
 ## Обновление приложения
 
 Актуальная версия приложения размещена на FTP-сервере с анонимным доступом.
 Для обновления достаточно скачать актуальную версию приложения и разархивировать в каталог приложения.
 
 ``` bash
-wget ftp://185.246.118.224/HeartBeatMonitor-linux-amd64.zip -O HeartBeatMonitor-linux-amd64.zip
-sudo unzip -o HeartBeatMonitor-linux-amd64.zip -d /srv/HBM -x appsettings.json
-sudo chmod +x /srv/HBM/HeartBeatMonitor-linux-amd64
-sudo systemctl restart hbm.service
+wget ftp://185.246.118.224/HeartBeatMonitor-linux-amd64.zip -O HeartBeatMonitor-linux-amd64.zip \
+&& sudo unzip -o HeartBeatMonitor-linux-amd64.zip -d /srv/HBM -x appsettings.json \
+&& sudo chmod +x /srv/HBM/HeartBeatMonitor-linux-amd64 \
+&& sudo systemctl restart hbm.service
 ```
+
+
+
 
 ## Пример файла hbm.service
 
