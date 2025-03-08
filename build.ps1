@@ -40,6 +40,10 @@ foreach ($target in $targets) {
     $env:GOOS = $target.GOOS
     $env:GOARCH = $target.GOARCH
     $output = "HeartBeatMonitor-$env:GOOS-$env:GOARCH"
+
+    $env:CC = "musl-gcc"
+    $env:CGO_ENABLED = 1
+
     go build -o ./Release/$env:GOOS/$output
     Write-Host "Built: $output"
     Copy-Item -Recurse -Force ./templates ./Release/$env:GOOS/
