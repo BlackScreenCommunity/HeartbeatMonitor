@@ -106,13 +106,20 @@ function renderList(data) {
 }
 const container = $("#data-container");
 
-
+ /**
+ * Subscribe to Server-Sent Events (SSE)
+ * Parse the received agent data as JSON and renders it on the page
+ **/
 eventSource.onmessage = function(event) {
     const jsonData = JSON.parse(event.data);
     container.append(renderList(jsonData));
 };
 
-eventSource.onerror = function() {
-    console.log("Ошибка соединения с сервером");
+/**
+ * Closes the SSE connection when an error occurs.
+ * Logs the error details to the console.
+ **/
+eventSource.onerror = function(event) {
+    console.error("SSE connection error:", event);
     eventSource.close();
 };
