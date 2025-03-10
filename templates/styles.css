@@ -24,12 +24,19 @@
     --positive-accent-color: var(--nord14);
     --nefgative-accent-color: var(--nord11);
 }
+
 body {
     font-family: Arial, sans-serif;
     background-color: var(--first-level-background-color);
     color: white;
     margin: 0;
     padding: 0;
+}
+
+h1 {
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase  
 }
 
 #data-container {
@@ -77,9 +84,9 @@ body {
     border: none;
 }
 
-
 .agent-name {
-    grid-column: 1 / -1;     font-size: 18px;
+    grid-column: 1 / -1;     
+    font-size: 18px;
     font-weight: bold;
     text-align: center;
     position: relative;
