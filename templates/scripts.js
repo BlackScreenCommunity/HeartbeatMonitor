@@ -23,7 +23,8 @@ function processWarnings() {
 
 const eventSource = new EventSource("/events");
 
-function renderList(data) {
+function renderList(data, levelClass) {
+    levelClass = levelClass ? levelClass : "";
 
     let html = "";
 
@@ -48,11 +49,6 @@ function renderList(data) {
         }
 
         let pluginName = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
-        let pluginType = data.hasOwnProperty("Type") ? data.Type : "";
-
-        if(pluginType) {
-            delete data["Type"];
-        }
 
         if(pluginName) {
             data = data?.data;
@@ -61,22 +57,47 @@ function renderList(data) {
         if(pluginName) {
             html += `<div class='plugin-data'>`;
             html += `<div class='plugin-name'> ${pluginName} </div>`;
-        }
-
-        
-        else {
+        } 
+        else 
+        {
             for (let key in data) {
                 let widgetClass = isWarning ? "widget warning" : "widget";
-                widgetClass += " " + pluginType
-                html += `<div class='${widgetClass}'>`;
+                
+
+                let pluginType = data[key].hasOwnProperty("Type") ? data[key].Type : "";
+
+                if(pluginType) {
+                    delete data[key]["Type"];
+                }
+
+
+                widgetSize = "";
+                if(levelClass != "inner") {
+                    widgetSize = "small";
+                    if(Object.keys(data[key]).length > 4 ) {
+                        widgetSize = "big"
+                    }
+
+                    widgetClass += " " + pluginType;
+                }   
+                
+                
+                
+                widgetClass += " " + widgetSize
+                
+                if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
+                    {
+                        data = data[Object.keys(data)[0]];
+                        html += renderList(data, "inner");
+                    }
+                
+                    
+                
+                html += `<div class='${levelClass} ${widgetClass}'>`;
                 html += `<div class='widget-title'>${key}:</div>`;
 
-                if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
                 {
-                    data = data[Object.keys(data)[0]];
-                    html += renderList(data);
-                } else {
-                    html += renderList(data[key]);
+                    html += renderList(data[key], "inner");
                 }
                 html += `</div>`;
             }
@@ -96,7 +117,7 @@ function renderList(data) {
     } else if (Array.isArray(data)) { 
         html += "<div class='data_array'>";
         data.forEach(value => {
-            html += `<div class='data_array_element'>${renderList(value)}</div>`;
+            html += `<div class='data_array_element'>${renderList(value, "list")}</div>`;
         });
         html += "</div>";
     } else { 
@@ -112,7 +133,7 @@ const container = $("#data-container");
  **/
 eventSource.onmessage = function(event) {
     const jsonData = JSON.parse(event.data);
-    container.append(renderList(jsonData));
+    container.append(renderList(jsonData, "outer"));
 };
 
 /**
