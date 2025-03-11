@@ -59,9 +59,9 @@ h1 {
     min-height: auto;
     align-self: start; }
 
-.widget:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+.agent-data > .widget:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 0px 12px 4px rgba(255, 255, 255, 0.1);
 }
 
 .widget-title {
@@ -132,3 +132,19 @@ h1 {
     min-width: max-content;
     margin: 1em;
 }
+
+
+.agent-data > .widget.small {
+    min-width: 15em;
+    min-height: 15em;
+}
+
+.agent-data > .widget.big {
+    min-width: 30em;
+    min-height: 30em;
+}
+
+.inner.widget  {
+    padding: 0;
+}
+
