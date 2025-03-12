@@ -1,3 +1,4 @@
 .outer.widget.widget.PostgreSqlQueryPlugin {
     min-width: 34em;
+    height: fit-content;
 }

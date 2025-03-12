@@ -126,6 +126,8 @@ h1 {
 
 .agent-data {
     display: flex;
+    flex-wrap: wrap;
+    width: 98vw;
 }
 
 .agent-data > .widget {
@@ -135,8 +137,8 @@ h1 {
 
 
 .agent-data > .widget.small {
-    min-width: 15em;
-    min-height: 15em;
+    width: 15em;
+    height: 15em;
 }
 
 .agent-data > .widget.big {
