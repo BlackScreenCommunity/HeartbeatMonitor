@@ -1,3 +1,8 @@
+.outer.widget.widget.PostgreSqlQueryPlugin {
+    min-width: 34em;
+    height: fit-content;
+}
+
 :root {
     --nord0: #2e3440;
     --nord1: #3b4252;
@@ -50,14 +55,13 @@ h1 {
     padding: 15px;
     border-radius: 5px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
     font-size: 14px;
     transition: transform 0.3s, box-shadow 0.3s;
     min-height: auto;
-    align-self: start; }
+    align-items: center;
+    flex-direction: column;
+    }
 
 .agent-data > .widget:hover {
     transform: scale(1.1);
@@ -68,11 +72,11 @@ h1 {
     font-weight: bold;
     margin-bottom: 5px;
     color: var(--title-color);
+    font-size: 1.2em
 }
 
 .widget-data {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 1em;
 }
 
 .parent-warning {
@@ -150,3 +154,7 @@ h1 {
     padding: 0;
 }
 
+.outer.widget {
+    margin: 0.5em;
+    padding: 1em;
+}
