@@ -23,8 +23,35 @@ function processWarnings() {
 
 const eventSource = new EventSource("/events");
 
+function sortAgentsData(pluginsData) {
+    if(pluginsData) {
+        let sortable = [];
+        for (var plugin in pluginsData) {
+            sortable.push([plugin, pluginsData[plugin]]);
+        }
+    
+        sortable.sort(function(a, b) {
+            return JSON.stringify(b).length - JSON.stringify(a).length;
+        });
+
+
+        pluginsData = {};
+        sortable.forEach(function(item){
+            pluginsData[item[0]]=item[1]
+        })
+
+        return pluginsData;
+    }
+}
+
 function renderList(data, levelClass) {
     levelClass = levelClass ? levelClass : "";
+
+    if(data?.data) {
+        data.data = sortAgentsData(data.data);
+    }
+    
+
 
     let html = "";
 
