@@ -45,6 +45,7 @@ function sortAgentsData(pluginsData) {
 }
 
 function renderList(data, levelClass) {
+
     levelClass = levelClass ? levelClass : "";
 
     if(data?.data) {
@@ -113,20 +114,18 @@ function renderList(data, levelClass) {
                 widgetClass += " " + widgetSize
                 
                 if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
-                    {
-                        data = data[Object.keys(data)[0]];
-                        html += renderList(data, "inner");
-                    }
-                
-                    
-                
-                html += `<div class='${levelClass} ${widgetClass}'>`;
-                html += `<div class='widget-title'>${key}:</div>`;
-
                 {
-                    html += renderList(data[key], "inner");
+                    data = data[Object.keys(data)[0]];
+                    html += renderList(data, "inner");
                 }
-                html += `</div>`;
+                else {
+                    html += `<div class='${levelClass} ${widgetClass}'>`;
+                    html += `<div class='widget-title'>${key}:</div>`;
+                    html += renderList(data[key], "inner");                    
+                    html += `</div>`;
+                }
+                
+                
             }
         }
 
