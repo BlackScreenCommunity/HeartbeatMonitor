@@ -102,7 +102,10 @@ function renderList(data, levelClass) {
                 widgetSize = "";
                 if(levelClass != "inner") {
                     widgetSize = "small";
-                    if(Object.keys(data[key]).length > 4 ) {
+
+                    let isString = typeof data[key] === 'string' || data[key] instanceof String;
+
+                    if(!isString && Object.keys(data[key]).length > 4 ) {
                         widgetSize = "big"
                     }
 
