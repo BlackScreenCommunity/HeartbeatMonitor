@@ -25,7 +25,7 @@ type WebServerConfig struct {
 type AgentConfig struct {
 	Address  string
 	Name     string
-	IsActive bool
+	Active   bool
 	Login    string
 	Password string
 }

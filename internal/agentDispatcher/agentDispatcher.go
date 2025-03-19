@@ -34,7 +34,7 @@ func GetMetricsFromAgents() map[string]interface{} {
 	agentResultCollection := make(map[string]interface{})
 
 	for i, agent := range agents {
-		if agent.IsActive {
+		if agent.Active {
 			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
 				result := GetMetricsFromSingleAgent(agent)
 				resultsChannel <- struct {

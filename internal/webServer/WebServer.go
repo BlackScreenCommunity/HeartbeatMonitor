@@ -107,7 +107,7 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 	}, len(agents))
 
 	for i, agent := range agents {
-		if agent.IsActive {
+		if agent.Active {
 			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
 				start := time.Now()
 				result := agentDispatcher.GetMetricsFromSingleAgent(agent)
