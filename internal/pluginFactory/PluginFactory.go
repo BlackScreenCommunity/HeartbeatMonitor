@@ -16,6 +16,8 @@ func init() {
 	registeredPlugins["FolderSizePlugin"] = func() plugins.Plugin { return &plugins.FolderSizePlugin{} }
 	registeredPlugins["ServerTimePlugin"] = func() plugins.Plugin { return &plugins.ServerTimePlugin{} }
 	registeredPlugins["ServiceStatusPlugin"] = func() plugins.Plugin { return &plugins.ServiceStatusPlugin{} }
+	registeredPlugins["DockerContainerStatusPlugin"] = func() plugins.Plugin { return &plugins.DockerContainerStatusPlugin{} }
+
 }
 
 // Collection of registered plugins
