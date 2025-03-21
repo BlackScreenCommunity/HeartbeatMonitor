@@ -30,14 +30,18 @@ func (d DockerContainerStatusPlugin) Collect() (map[string]interface{}, error) {
 
 	for _, container := range containers {
 		name := ""
+		state := ""
+
 		if len(container.Names) > 0 {
 			name = container.Names[0]
+			state = container.State
 		}
 
 		uptime := now.Sub(time.Unix(container.Created, 0)).String()
 
 		results = append(results, map[string]interface{}{
 			"name":   name,
+			"state":  state,
 			"uptime": uptime,
 		})
 	}
