@@ -2,7 +2,9 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
@@ -34,8 +36,11 @@ func (plugin DockerContainerStatusPlugin) Collect() (map[string]interface{}, err
 		}
 
 		results[name] = map[string]interface{}{
-			"state":  container.State,
-			"uptime": now.Sub(time.Unix(container.Created, 0)).Round(time.Second).String(),
+			"State":        container.State,
+			"Image":        container.Image,
+			"Uptime":       now.Sub(time.Unix(container.Created, 0)).Round(time.Second).String(),
+			"Container Id": container.ID[:10],
+			"Ports":        GetPortsForContainer(container),
 		}
 	}
 
@@ -56,4 +61,18 @@ func GetContainers() ([]container.Summary, error) {
 	}
 
 	return containers, nil
+}
+
+// Формат вывода можно настроить под себя. Например, "IP:Public->Private/Type"
+func GetPortsForContainer(containerInfo container.Summary) string {
+	seen := make(map[string]struct{})
+	var ports []string
+	for _, p := range containerInfo.Ports {
+		portStr := fmt.Sprintf("%d->%d", p.PublicPort, p.PrivatePort)
+		if _, exists := seen[portStr]; !exists {
+			seen[portStr] = struct{}{}
+			ports = append(ports, portStr)
+		}
+	}
+	return strings.Join(ports, ", ")
 }
