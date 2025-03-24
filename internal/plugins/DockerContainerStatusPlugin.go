@@ -11,18 +11,21 @@ import (
 	"github.com/docker/docker/client"
 )
 
+// Plugin that collects information of Docker containers
 type DockerContainerStatusPlugin struct{}
 
+// Returns the name of plugin instance
 func (plugin DockerContainerStatusPlugin) Name() string {
 	return "Docker Container Status Plugin"
 }
 
+// Collect information for each Docker container
+// Returns a map that includes container's
+// state, image, uptime, container ID and port mappings
 func (plugin DockerContainerStatusPlugin) Collect() (map[string]interface{}, error) {
 
 	results := make(map[string]interface{})
 	results["Type"] = reflect.TypeOf(plugin).Name()
-
-	now := time.Now()
 
 	containers, err := GetContainers()
 	if err != nil {
@@ -32,13 +35,14 @@ func (plugin DockerContainerStatusPlugin) Collect() (map[string]interface{}, err
 	for _, container := range containers {
 		name := ""
 		if len(container.Names) > 0 {
-			name = container.Names[0]
+			// Remove the leading slash from the container name
+			name = strings.Replace(container.Names[0], "/", "", 1)
 		}
 
 		results[name] = map[string]interface{}{
 			"State":        container.State,
 			"Image":        container.Image,
-			"Uptime":       now.Sub(time.Unix(container.Created, 0)).Round(time.Second).String(),
+			"Uptime":       time.Since(time.Unix(container.Created, 0)).Round(time.Second).String(),
 			"Container Id": container.ID[:10],
 			"Ports":        GetPortsForContainer(container),
 		}
@@ -49,6 +53,8 @@ func (plugin DockerContainerStatusPlugin) Collect() (map[string]interface{}, err
 	}, nil
 }
 
+// Connects to Docker and retrieves a list of containers
+// Returns a list of containers info
 func GetContainers() ([]container.Summary, error) {
 	client, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -63,15 +69,17 @@ func GetContainers() ([]container.Summary, error) {
 	return containers, nil
 }
 
-// Формат вывода можно настроить под себя. Например, "IP:Public->Private/Type"
+// Returns the port mappings for a container
+// in "PublicPort->PrivatePort" format
 func GetPortsForContainer(containerInfo container.Summary) string {
-	seen := make(map[string]struct{})
+	duplicatesPorts := make(map[string]struct{})
 	var ports []string
 	for _, p := range containerInfo.Ports {
-		portStr := fmt.Sprintf("%d->%d", p.PublicPort, p.PrivatePort)
-		if _, exists := seen[portStr]; !exists {
-			seen[portStr] = struct{}{}
-			ports = append(ports, portStr)
+		formattedPort := fmt.Sprintf("%d->%d", p.PublicPort, p.PrivatePort)
+
+		if _, exists := duplicatesPorts[formattedPort]; !exists {
+			duplicatesPorts[formattedPort] = struct{}{}
+			ports = append(ports, formattedPort)
 		}
 	}
 	return strings.Join(ports, ", ")

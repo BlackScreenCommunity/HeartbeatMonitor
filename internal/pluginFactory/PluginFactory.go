@@ -24,7 +24,7 @@ func init() {
 // Key: plugin name, Value: function that creates a new plugin instance.
 var registeredPlugins = make(map[string]func() plugins.Plugin)
 
-// Creates a new plugin instance by its name and fills its fields with values from recieved parameters.
+// Creates a new plugin instance by its name and fills plugins fields with values from recieved parameters.
 //
 // name - the registered type name of the plugin.
 // params - a map of parameters, where keys match the field names of the plugin's struct.

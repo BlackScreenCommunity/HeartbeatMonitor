@@ -76,7 +76,7 @@ func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 
 func (plugin PostgreSqlQueryPlugin) ProcessData(rows *sql.Rows, columns []string, IsSingleValue bool) (map[string]interface{}, error) {
 	results := make(map[string]interface{}, 0)
-	var rowNumber = 0
+	rowNumber := 0
 
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
