@@ -32,7 +32,7 @@ func (plugin DockerContainerStatusPlugin) Collect() (map[string]interface{}, err
 	for _, container := range containers {
 		name := ""
 		if len(container.Names) > 0 {
-			name = container.Names[0]
+			name = strings.Replace(container.Names[0], "/", "", 1)
 		}
 
 		results[name] = map[string]interface{}{
