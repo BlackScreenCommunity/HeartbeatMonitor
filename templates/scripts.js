@@ -24,20 +24,20 @@ function processWarnings() {
 const eventSource = new EventSource("/events");
 
 function sortAgentsData(pluginsData) {
-    if(pluginsData) {
+    if (pluginsData) {
         let sortable = [];
         for (var plugin in pluginsData) {
             sortable.push([plugin, pluginsData[plugin]]);
         }
-    
-        sortable.sort(function(a, b) {
+
+        sortable.sort(function (a, b) {
             return JSON.stringify(b).length - JSON.stringify(a).length;
         });
 
 
         pluginsData = {};
-        sortable.forEach(function(item){
-            pluginsData[item[0]]=item[1]
+        sortable.forEach(function (item) {
+            pluginsData[item[0]] = item[1]
         })
 
         return pluginsData;
@@ -48,27 +48,27 @@ function renderList(data, levelClass) {
 
     levelClass = levelClass ? levelClass : "";
 
-    if(data?.data) {
+    if (data?.data) {
         data.data = sortAgentsData(data.data);
     }
-    
+
 
 
     let html = "";
 
-    if (typeof data === "object" && !Array.isArray(data)) { 
+    if (typeof data === "object" && !Array.isArray(data)) {
         let duration = 0;
         let isWarning = data.hasOwnProperty("isWarning") ? data.isWarning : false;
         delete data["isWarning"];
 
-        
+
         let agentName = data.hasOwnProperty("agent_name") ? data.agent_name : "";
-        if(agentName) {
+        if (agentName) {
             duration = data?.duration;
             data = data?.data;
         }
 
-        if(agentName) {
+        if (agentName) {
             html += `<div class='agent-name'> ${agentName}`;
             html += `<div class='timer agent-duration'> Loading time ${duration} seconds </div>`;
             html += `</div>`
@@ -78,64 +78,62 @@ function renderList(data, levelClass) {
 
         let pluginName = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
 
-        if(pluginName) {
+        if (pluginName) {
             data = data?.data;
         }
 
-        if(pluginName) {
+        if (pluginName) {
             html += `<div class='plugin-data'>`;
             html += `<div class='plugin-name'> ${pluginName} </div>`;
-        } 
-        else 
-        {
+        }
+        else {
             for (let key in data) {
                 let widgetClass = isWarning ? "widget warning" : "widget";
-                
+
 
                 let pluginType = data[key].hasOwnProperty("Type") ? data[key].Type : "";
 
-                if(pluginType) {
+                if (pluginType) {
                     delete data[key]["Type"];
                 }
 
 
                 widgetSize = "";
-                if(levelClass != "inner") {
+                if (levelClass != "inner") {
                     widgetSize = "small";
 
                     let isString = typeof data[key] === 'string' || data[key] instanceof String;
 
-                    if(!isString && Object.keys(data[key]).length > 4 ) {
+                    if (!isString && Object.keys(data[key]).length > 4) {
                         widgetSize = "big"
                     }
 
                     widgetClass += " " + pluginType;
-                }   
-                
-                
-                
+                }
+
+
+
                 widgetClass += " " + widgetSize
-                
-                if (Object.keys(data).length == 1 && typeof(data[Object.keys(data)[0]]) != "string")
-                {
+
+                if (Object.keys(data).length == 1 && typeof (data[Object.keys(data)[0]]) != "string") {
                     data = data[Object.keys(data)[0]];
                     html += renderList(data, "inner");
                 }
                 else {
                     html += `<div class='${levelClass} ${widgetClass}'>`;
                     html += `<div class='widget-title'>${key}:</div>`;
-                    html += renderList(data[key], "inner");                    
+                    html += renderList(data[key], "inner");
                     html += `</div>`;
                 }
-                
-                
+
+
             }
         }
 
-        if(pluginName) {
+        if (pluginName) {
             html += `</div>`;
         }
-        if(agentName) {
+        if (agentName) {
             html += `</div>`;
         }
 
@@ -143,24 +141,24 @@ function renderList(data, levelClass) {
         //     html += `</div>`;
         // }
 
-    } else if (Array.isArray(data)) { 
+    } else if (Array.isArray(data)) {
         html += "<div class='data_array'>";
         data.forEach(value => {
             html += `<div class='data_array_element'>${renderList(value, "list")}</div>`;
         });
         html += "</div>";
-    } else { 
+    } else {
         html = `<div class='widget-data'>${data}</div>`;
     }
     return html;
 }
 const container = $("#data-container");
 
- /**
- * Subscribe to Server-Sent Events (SSE)
- * Parse the received agent data as JSON and renders it on the page
- **/
-eventSource.onmessage = function(event) {
+/**
+* Subscribe to Server-Sent Events (SSE)
+* Parse the received agent data as JSON and renders it on the page
+**/
+eventSource.onmessage = function (event) {
     const jsonData = JSON.parse(event.data);
     container.append(renderList(jsonData, "outer"));
 };
@@ -169,7 +167,27 @@ eventSource.onmessage = function(event) {
  * Closes the SSE connection when an error occurs.
  * Logs the error details to the console.
  **/
-eventSource.onerror = function(event) {
+eventSource.onerror = function (event) {
     console.error("SSE connection error:", event);
     eventSource.close();
+    hideNonWarningWidgets();
+};
+
+
+const toggleSwitch = document.getElementById('toggleSwitch');
+
+toggleSwitch.addEventListener('change', hideNonWarningWidgets);
+    
+    
+function hideNonWarningWidgets () {
+    let toggleSwitch = document.getElementById('toggleSwitch');
+
+    console.log("hideNonWarningWidgets");
+    const widgets = document.querySelectorAll('.outer.widget');
+
+    widgets.forEach(widget => {
+        if (!widget.classList.contains('parent-warning')) {
+            widget.style.display = toggleSwitch.checked ? 'none' : '';
+        }
+    });
 };
