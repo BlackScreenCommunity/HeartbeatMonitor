@@ -11,7 +11,10 @@
 <body>
     <h1>{{ serverInfo }}</h1>
     <label>
-        <input type="checkbox" id="toggleSwitch" checked>
+        <label class="switch">
+            <input type="checkbox" id="toggleSwitch" checked>
+            <span class="slider"></span>
+          </label>
         Скрыть виджеты без parent-warning
       </label>
     <div id="data-container"></div>
