@@ -164,11 +164,9 @@ eventSource.onmessage = function (event) {
 };
 
 /**
- * Closes the SSE connection when an error occurs.
- * Logs the error details to the console.
+ * Closes the SSE connection
  **/
 eventSource.onerror = function (event) {
-    console.error("SSE connection error:", event);
     eventSource.close();
     hideNonWarningWidgets();
 };
