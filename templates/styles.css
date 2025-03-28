@@ -181,7 +181,7 @@ h1 {
     cursor: pointer;
     top: 0;
     left: 0;
-    right: 1.2em;
+    right: 1.4em;
     bottom: 0;
     background-color: var(--nord1);
     transition: 0.4s;
@@ -192,15 +192,15 @@ h1 {
   .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
+    height: 1.8em;
+    width: 1.8em;
+    left: 0.15em;
+    bottom: 0.15em;
     background-color: var(--nord3);
     transition: 0.4s;
     border-radius: 50%;
-  }
-  
+}
+
   /* Состояние включено */
   .switch input:checked + .slider {
     background-color: var(--nord11);
@@ -208,4 +208,18 @@ h1 {
   
   .switch input:checked + .slider:before {
     transform: translateX(1.5em);
+  }
+
+  .switch-container {
+    display: flex; justify-content: flex-end
+  }
+  .switch-container-items {
+    display: flex;
+  }
+
+  .switch-container-label {
+    padding-right: 1em;
+    max-width: 10em;
+    text-align: right;
+    color: var(--nord9);
   }
