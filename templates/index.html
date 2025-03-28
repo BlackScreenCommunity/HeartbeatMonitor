@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeartBeat Monitor on {{ serverInfo }}</title>
-    <link rel="icon" type="image/x-icon" href="/templates/favicon.ico">
-    <link rel="stylesheet" href="styles.css">
-    <script src="/templates/jquery.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HeartBeat Monitor on {{ serverInfo }}</title>
+	<link rel="icon" type="image/x-icon" href="/templates/favicon.ico">
+	<link rel="stylesheet" href="styles.css">
+	<script src="/templates/jquery.js"></script>
 </head>
+
 <body>
-    <h1>{{ serverInfo }}</h1>
-    <div class="switch-container">
-      <div class="switch-container-items">
-        <div class="switch-container-label">Отображать только предупреждения</div>
-        <label class="switch">
-            <input type="checkbox" id="toggleSwitch" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-    </div>
-    <div id="data-container"></div>
-    <script src="templates/scripts.js"></script>
+	<h1>{{ serverInfo }}</h1>
+	<div class="switch-container">
+		<div class="switch-container-items">
+			<div class="switch-container-label">Отображать только предупреждения</div>
+			<label class="switch">
+				<input type="checkbox" id="toggleSwitch" checked>
+				<span class="slider"></span>
+			</label>
+		</div>
+	</div>
+	<div id="data-container"></div>
+	<script src="templates/scripts.js"></script>
 </body>
+
 </html>
