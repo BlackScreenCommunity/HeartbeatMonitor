@@ -171,16 +171,17 @@ eventSource.onerror = function (event) {
     hideNonWarningWidgets();
 };
 
-
+// Get the toggle switch element by its ID "toggleSwitch"
 const toggleSwitch = document.getElementById('toggleSwitch');
 
+// Add an event listener to the toggle switch when changed
 toggleSwitch.addEventListener('change', hideNonWarningWidgets);
-    
-    
+
+/**
+ * This function hides/shows widgets with warning class
+ */
 function hideNonWarningWidgets () {
     let toggleSwitch = document.getElementById('toggleSwitch');
-
-    console.log("hideNonWarningWidgets");
     const widgets = document.querySelectorAll('.outer.widget');
 
     widgets.forEach(widget => {
