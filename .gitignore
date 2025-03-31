@@ -28,3 +28,6 @@ go.work.sum
 /Release
 
 __debug*
+appsettings.json
+
+node_modules/*
