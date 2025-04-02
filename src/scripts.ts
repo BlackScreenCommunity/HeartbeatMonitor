@@ -125,6 +125,10 @@ function renderList(data: any, levelClass: string = ""): string {
     return html;
 }
 
+/**
+ * Container where data from the server 
+ * will be displayed 
+ **/
 const container = document.getElementById("data-container") as HTMLElement;
 
 /**
