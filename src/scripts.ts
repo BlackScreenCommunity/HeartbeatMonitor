@@ -25,6 +25,12 @@ interface PluginData {
     [key: string]: any;
 }
 
+/**
+ * Sorts plugin data by the length of each [key, value] pair's JSON string, from longest to shortest.
+ *
+ * Takes a PluginData object, turns it into an array of [key, value] pairs,
+ * Sorts data in PluginData object so plugins with longer data come first.
+ */
 function sortAgentsData(pluginsData: PluginData): PluginData {
     if (pluginsData) {
         let sortable: [string, any][] = Object.entries(pluginsData);
