@@ -1,3 +1,6 @@
+/**
+ * Create a MutationObserver that watches for changes in the DOM
+ **/ 
 const observer = new MutationObserver((mutationsList: MutationRecord[]) => {
     mutationsList.forEach((mutation: MutationRecord) => {
         if (mutation.type === "childList") {
@@ -6,21 +9,45 @@ const observer = new MutationObserver((mutationsList: MutationRecord[]) => {
     });
 });
 
+/**
+ * Select the document body as the target to observe for changes
+ */
 const targetNode: Node = document.body;
+
+/**
+ * Define the observer settings to watch 
+ * for changes in child elements and all of its descendants
+ */
 const config: MutationObserverInit = {
     childList: true,
     subtree: true
 };
+
+/** 
+ * Start observing
+ **/
 observer.observe(targetNode, config);
 
+
+/** 
+ * Find divs with 'warning' class 
+ * and marking their parent elements with warning
+ **/
 function processWarnings(): void {
     document.querySelectorAll("div.warning").forEach((el) => {
         el.parentElement?.classList.add("parent-warning");
     });
 }
 
+/**
+ * Create an EventSource to receive 
+ * server-sent events to the "/events" endpoint.
+ */
 const eventSource = new EventSource("/events");
 
+/**
+ * DataObject with plugions metrics data
+ */
 interface PluginData {
     [key: string]: any;
 }
