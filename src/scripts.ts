@@ -1,6 +1,6 @@
 /**
  * Create a MutationObserver that watches for changes in the DOM
- **/ 
+ **/
 const observer = new MutationObserver((mutationsList: MutationRecord[]) => {
     mutationsList.forEach((mutation: MutationRecord) => {
         if (mutation.type === "childList") {
@@ -73,90 +73,89 @@ function sortAgentsData(pluginsData: PluginData): PluginData {
     }
     return {};
 }
-
 function renderList(data: any, levelClass: string = ""): string {
+    if (data == null) return "";
+
+    if (Array.isArray(data)) {
+        const itemsHtml = data
+            .map((item) => `<div class="data_array_element">${renderList(item, "list")}</div>`)
+            .join("");
+        return `<div class="data_array">${itemsHtml}</div>`;
+    }
+
+    if (typeof data !== "object") {
+        return `<div class="widget-data">${data}</div>`;
+    }
+
+    let currentData = { ...data };
+
+    const isWarning: boolean = currentData.isWarning || false;
+    delete currentData.isWarning;
+
     let html = "";
 
-    if (typeof data === "object" && !Array.isArray(data)) {
-        let duration: number = 0;
-        let isWarning: boolean = data.hasOwnProperty("isWarning") ? data.isWarning : false;
-        delete data["isWarning"];
+    const hasAgent = "agent_name" in currentData;
+    if (hasAgent) {
+        const agentName: string = currentData.agent_name;
+        const duration: number = currentData.duration;
+        currentData = currentData.data;
+        html += `<div class="agent-name">
+                 ${agentName}
+                 <div class="timer agent-duration">Loading time ${duration} seconds</div>
+               </div>
+               <div class="agent-data">`;
+    }
 
-        let agentName: string = data.hasOwnProperty("agent_name") ? data.agent_name : "";
-        if (agentName) {
-            duration = data?.duration;
-            data = data?.data;
-        }
+    const hasPlugin = currentData && "plugin_name" in currentData;
+    if (hasPlugin) {
+        const pluginName: string = currentData.plugin_name;
+        currentData = currentData.data;
+        html += `<div class="plugin-data">
+                 <div class="plugin-name">${pluginName}</div>`;
+    } else {
+        for (const key in currentData) {
+            if (!currentData.hasOwnProperty(key)) continue;
+            let item = currentData[key];
+            let widgetClass = `widget${isWarning ? " warning" : ""}`;
+            let pluginType = "";
 
-        if (agentName) {
-            html += `<div class='agent-name'> ${agentName}`;
-            html += `<div class='timer agent-duration'> Loading time ${duration} seconds </div>`;
-            html += `</div>`;
-            html += `<div class='agent-data'>`;
-        }
+            if (typeof item === "object" && item && "Type" in item) {
+                pluginType = item.Type;
+                item = { ...item };
+                delete item.Type;
+            }
 
-        let pluginName: string = data.hasOwnProperty("plugin_name") ? data.plugin_name : "";
-
-        if (pluginName) {
-            data = data?.data;
-        }
-
-        if (pluginName) {
-            html += `<div class='plugin-data'>`;
-            html += `<div class='plugin-name'> ${pluginName} </div>`;
-        } else {
-            for (let key in data) {
-                let widgetClass: string = isWarning ? "widget warning" : "widget";
-
-                let pluginType: string = data[key].hasOwnProperty("Type") ? data[key].Type : "";
-                if (pluginType) {
-                    delete data[key]["Type"];
+            let widgetSize = "";
+            if (levelClass !== "inner") {
+                widgetSize = "small";
+                if (typeof item === "object" && item && !Array.isArray(item) && Object.keys(item).length > 4) {
+                    widgetSize = "big";
                 }
+                widgetClass += ` ${pluginType}`;
+            }
+            widgetClass += ` ${widgetSize}`;
 
-                let widgetSize: string = "";
-                if (levelClass !== "inner") {
-                    widgetSize = "small";
-
-                    let isString: boolean = typeof data[key] === "string" || data[key] instanceof String;
-
-                    if (!isString && Object.keys(data[key]).length > 4) {
-                        widgetSize = "big";
-                    }
-
-                    widgetClass += " " + pluginType;
-                }
-
-                widgetClass += " " + widgetSize;
-
-                if (Object.keys(data).length === 1 && typeof data[Object.keys(data)[0]] !== "string") {
-                    data = data[Object.keys(data)[0]];
-                    html += renderList(data, "inner");
-                } else {
-                    html += `<div class='${levelClass} ${widgetClass}'>`;
-                    html += `<div class='widget-title'>${key}:</div>`;
-                    html += renderList(data[key], "inner");
-                    html += `</div>`;
-                }
+            if (Object.keys(currentData).length === 1 && typeof item !== "string") {
+                html += renderList(item, "inner");
+            } else {
+                html += `<div class="${levelClass} ${widgetClass}">
+                     <div class="widget-title">${key}:</div>
+                     ${renderList(item, "inner")}
+                   </div>`;
             }
         }
-
-        if (pluginName) {
-            html += `</div>`;
-        }
-        if (agentName) {
-            html += `</div>`;
-        }
-    } else if (Array.isArray(data)) {
-        html += "<div class='data_array'>";
-        data.forEach((value) => {
-            html += `<div class='data_array_element'>${renderList(value, "list")}</div>`;
-        });
-        html += "</div>";
-    } else {
-        html = `<div class='widget-data'>${data}</div>`;
     }
+
+    if (hasPlugin) {
+        html += `</div>`;
+    }
+    if (hasAgent) {
+        html += `</div>`;
+    }
+
     return html;
 }
+
 
 /**
  * Container where data from the server 
