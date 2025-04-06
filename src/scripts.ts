@@ -73,83 +73,141 @@ function sortAgentsData(pluginsData: PluginData): PluginData {
     }
     return {};
 }
+
+/**
+ * Render simple widget data, like text, number, etc
+ */
+function renderPrimitive(data: any): string {
+    return `<div class="widget-data">${data}</div>`;
+}
+
+/**
+ Render set of widget indicators
+ */
+function renderArray(data: any[]): string {
+    const itemsHtml = data
+        .map((item) => `<div class="data_array_element">${renderList(item, "list")}</div>`)
+        .join("");
+    return `<div class="data_array">${itemsHtml}</div>`;
+}
+
+/**
+ * Render agent's plugins data
+ */
+function renderAgentSection(data: any): { html: string; data: any } {
+    if ("agent_name" in data) {
+        const agentName: string = data.agent_name;
+        const duration: number = data.duration;
+
+        const innerData = data.data;
+        const html = `<div class="agent-name">
+                      ${agentName}
+                      <div class="timer agent-duration">Loading time ${duration} seconds</div>
+                    </div>
+                    <div class="agent-data">`;
+        return { html, data: innerData };
+    }
+    return { html: "", data };
+}
+
+/**
+ * Render plugin data
+ */
+function renderPluginHeader(data: any): { html: string; data: any } {
+    if (data && "plugin_name" in data) {
+        const pluginName: string = data.plugin_name;
+
+        const innerData = data.data;
+        const html = `<div class="plugin-data">
+                      <div class="plugin-name">${pluginName}</div>`;
+        return { html, data: innerData };
+    }
+    return { html: "", data };
+}
+
+// Функция для отрисовки виджетов внутри объекта
+function renderPluginData(
+    data: any,
+    levelClass: string,
+    isWarning: boolean
+): string {
+    let html = "";
+    for (const key in data) {
+        if (!data.hasOwnProperty(key)) continue;
+
+        let item = data[key];
+        let widgetClass = `widget${isWarning ? " warning" : ""}`;
+        let pluginType = "";
+
+        if (typeof item === "object" && item && "Type" in item) {
+            pluginType = item.Type;
+            item = { ...item };
+            delete item.Type;
+        }
+
+        let widgetSize = "";
+        if (levelClass !== "inner") {
+            widgetSize = "small";
+            if (
+                typeof item === "object" &&
+                item &&
+                !Array.isArray(item) &&
+                Object.keys(item).length > 4
+            ) {
+                widgetSize = "big";
+            }
+            widgetClass += ` ${pluginType}`;
+        }
+        widgetClass += ` ${widgetSize}`;
+
+        if (Object.keys(data).length === 1 && typeof item !== "string") {
+            html += renderList(item, "inner");
+        } else {
+            html += `<div class="${levelClass} ${widgetClass}">
+                    <div class="widget-title">${key}:</div>
+                    ${renderList(item, "inner")}
+                 </div>`;
+        }
+    }
+    return html;
+}
+
+/**
+ * Render plugins data recieved from server
+ */
 function renderList(data: any, levelClass: string = ""): string {
     if (data == null) return "";
 
     if (Array.isArray(data)) {
-        const itemsHtml = data
-            .map((item) => `<div class="data_array_element">${renderList(item, "list")}</div>`)
-            .join("");
-        return `<div class="data_array">${itemsHtml}</div>`;
+        return renderArray(data);
     }
 
     if (typeof data !== "object") {
-        return `<div class="widget-data">${data}</div>`;
+        return renderPrimitive(data);
     }
 
     let currentData = { ...data };
-
     const isWarning: boolean = currentData.isWarning || false;
     delete currentData.isWarning;
 
     let html = "";
 
-    const hasAgent = "agent_name" in currentData;
-    if (hasAgent) {
-        const agentName: string = currentData.agent_name;
-        const duration: number = currentData.duration;
-        currentData = currentData.data;
-        html += `<div class="agent-name">
-                 ${agentName}
-                 <div class="timer agent-duration">Loading time ${duration} seconds</div>
-               </div>
-               <div class="agent-data">`;
+    const { html: agentHtml, data: afterAgentData } = renderAgentSection(currentData);
+    html += agentHtml;
+    currentData = afterAgentData;
+
+    const { html: pluginHtml, data: afterPluginData } = renderPluginHeader(currentData);
+    html += pluginHtml;
+    currentData = afterPluginData;
+
+    if (!pluginHtml) {
+        html += renderPluginData(currentData, levelClass, isWarning);
     }
 
-    const hasPlugin = currentData && "plugin_name" in currentData;
-    if (hasPlugin) {
-        const pluginName: string = currentData.plugin_name;
-        currentData = currentData.data;
-        html += `<div class="plugin-data">
-                 <div class="plugin-name">${pluginName}</div>`;
-    } else {
-        for (const key in currentData) {
-            if (!currentData.hasOwnProperty(key)) continue;
-            let item = currentData[key];
-            let widgetClass = `widget${isWarning ? " warning" : ""}`;
-            let pluginType = "";
-
-            if (typeof item === "object" && item && "Type" in item) {
-                pluginType = item.Type;
-                item = { ...item };
-                delete item.Type;
-            }
-
-            let widgetSize = "";
-            if (levelClass !== "inner") {
-                widgetSize = "small";
-                if (typeof item === "object" && item && !Array.isArray(item) && Object.keys(item).length > 4) {
-                    widgetSize = "big";
-                }
-                widgetClass += ` ${pluginType}`;
-            }
-            widgetClass += ` ${widgetSize}`;
-
-            if (Object.keys(currentData).length === 1 && typeof item !== "string") {
-                html += renderList(item, "inner");
-            } else {
-                html += `<div class="${levelClass} ${widgetClass}">
-                     <div class="widget-title">${key}:</div>
-                     ${renderList(item, "inner")}
-                   </div>`;
-            }
-        }
-    }
-
-    if (hasPlugin) {
+    if (pluginHtml) {
         html += `</div>`;
     }
-    if (hasAgent) {
+    if (agentHtml) {
         html += `</div>`;
     }
 
