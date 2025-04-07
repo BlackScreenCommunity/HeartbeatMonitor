@@ -31,3 +31,4 @@ __debug*
 appsettings.json
 
 node_modules/*
+templates/bundle.js

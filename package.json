@@ -1,8 +1,32 @@
 {
   "devDependencies": {
-    "typescript": "^5.8.2"
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.0",
+    "webpack-cli": "^6.0.1"
   },
   "scripts": {
-	  "build": "tsc"
-	}
+    "build": "tsc",
+    "bundle": "webpack"
+  },
+  "dependencies": {
+    "gridstack": "^11.5.1"
+  },
+  "name": "heartbeatmonitor",
+  "version": "1.0.0",
+  "description": "HeartbeatMonitor — это простая система мониторинга серверов и приложений, которая собирает и отображает метрики с удалённых агентов. Изначально разрабатывалось для мониторинга серверов web-приложения BPMSoft и Creatio.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlackScreenCommunity/HeartbeatMonitor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BlackScreenCommunity/HeartbeatMonitor/issues"
+  },
+  "homepage": "https://github.com/BlackScreenCommunity/HeartbeatMonitor#readme"
 }

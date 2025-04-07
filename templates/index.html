@@ -7,7 +7,8 @@
 	<title>HeartBeat Monitor on {{ serverInfo }}</title>
 	<link rel="icon" type="image/x-icon" href="/templates/favicon.ico">
 	<link rel="stylesheet" href="styles.css">
-	<script src="/templates/jquery.js"></script>
+	<script type="module" src="/templates/jquery.js"></script>
+	<script type="module" src="/templates/bundle.js"></script>
 </head>
 
 <body>
@@ -22,7 +23,8 @@
 		</div>
 	</div>
 	<div id="data-container"></div>
-	<script src="templates/scripts.js"></script>
+
+	<div class="grid-stack"></div>
 </body>
 
 </html>
