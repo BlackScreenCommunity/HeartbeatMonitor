@@ -1,3 +1,40 @@
+import 'gridstack/dist/gridstack.min.css';
+import { GridStack } from 'gridstack';
+var grid = GridStack.init();
+
+
+let items = [
+    {x: 1, y: 1, w: 1, h: 1}, //, locked:true, content:"locked"},
+
+  ];
+  let count = 0;
+
+function getNode() {
+    let n = items[count] || {
+      x: Math.round(12 * Math.random()),
+      y: Math.round(5 * Math.random()),
+      w: 2,
+      h: 2
+    };
+    count++;
+    return n;
+  };
+
+function addNewWidget() {
+let w = grid.addWidget(getNode());
+};
+
+function makeNewWidget(innerHtml: string) {
+let n = getNode();
+let doc = document.implementation.createHTMLDocument();
+doc.body.innerHTML = `<div class="item" gs-x="${n.x}" gs-y="${n.y}" gs-w="${n.w || 1}" gs-h="${n.h || 1}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
+let el = doc.body.children[0] as HTMLElement; 
+grid.el.appendChild(el);
+// example showing when DOM is created elsewhere (eg Angular/Vue/React) and GS is used to convert to a widget
+let w = grid.makeWidget(el);
+};
+
+
 /**
  * Create a MutationObserver that watches for changes in the DOM
  **/
@@ -86,7 +123,7 @@ function renderPrimitive(data: any): string {
  */
 function renderArray(data: any[]): string {
     const itemsHtml = data
-        .map((item) => `<div class="data_array_element">${renderList(item, "list")}</div>`)
+        .map((item) => `<div class="data_array_element">${renderList(item, 99)}</div>`)
         .join("");
     return `<div class="data_array">${itemsHtml}</div>`;
 }
@@ -110,6 +147,20 @@ function renderAgentSection(data: any): { html: string; data: any } {
     return { html: "", data };
 }
 
+function renderAgentTitleForWidget(data: any): { html: string; data: any } {
+    if ("agent_name" in data) {
+        const agentName: string = data.agent_name;
+        const duration: number = data.duration;
+
+        const innerData = data.data;
+        const html = `<div class="built-in-agent-name">
+                      ${agentName}
+                    </div>
+                    `;
+        return { html, data: innerData };
+    }
+    return { html: "", data };
+}
 /**
  * Render plugin data
  */
@@ -128,7 +179,7 @@ function renderPluginHeader(data: any): { html: string; data: any } {
 // Функция для отрисовки виджетов внутри объекта
 function renderPluginData(
     data: any,
-    levelClass: string,
+    levelClass: number,
     isWarning: boolean
 ): string {
     let html = "";
@@ -146,7 +197,7 @@ function renderPluginData(
         }
 
         let widgetSize = "";
-        if (levelClass !== "inner") {
+        if (levelClass > 1) {
             widgetSize = "small";
             if (
                 typeof item === "object" &&
@@ -161,11 +212,11 @@ function renderPluginData(
         widgetClass += ` ${widgetSize}`;
 
         if (Object.keys(data).length === 1 && typeof item !== "string") {
-            html += renderList(item, "inner");
+            html += renderList(item, levelClass+1);
         } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
-                    ${renderList(item, "inner")}
+                    ${renderList(item, levelClass+1)}
                  </div>`;
         }
     }
@@ -175,7 +226,7 @@ function renderPluginData(
 /**
  * Render plugins data recieved from server
  */
-function renderList(data: any, levelClass: string = ""): string {
+function renderList(data: any, levelClass: number = 0): string {
     if (data == null) return "";
 
     if (Array.isArray(data)) {
@@ -192,23 +243,22 @@ function renderList(data: any, levelClass: string = ""): string {
 
     let html = "";
 
-    const { html: agentHtml, data: afterAgentData } = renderAgentSection(currentData);
-    html += agentHtml;
+    const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);    // html += agentHtml;
     currentData = afterAgentData;
 
     const { html: pluginHtml, data: afterPluginData } = renderPluginHeader(currentData);
     html += pluginHtml;
     currentData = afterPluginData;
 
+    let pluginDataHtml = agentTitleHtml;
+
     if (!pluginHtml) {
-        html += renderPluginData(currentData, levelClass, isWarning);
+        pluginDataHtml += renderPluginData(currentData, levelClass+1, isWarning);
+        
     }
 
-    if (pluginHtml) {
-        html += `</div>`;
-    }
-    if (agentHtml) {
-        html += `</div>`;
+    if(pluginDataHtml.length > 0 && levelClass >= 1 && levelClass <= 2) {
+        makeNewWidget(`${pluginDataHtml}`);
     }
 
     return html;
@@ -227,7 +277,7 @@ const container = document.getElementById("data-container") as HTMLElement;
  **/
 eventSource.onmessage = function (event: MessageEvent) {
     const jsonData = JSON.parse(event.data);
-    container.insertAdjacentHTML("beforeend", renderList(jsonData, "outer"));
+    container.insertAdjacentHTML("beforeend", renderList(jsonData, 0));
 };
 
 /**
@@ -257,3 +307,4 @@ function hideNonWarningWidgets(): void {
         }
     });
 }
+
