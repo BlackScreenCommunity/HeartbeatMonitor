@@ -3,6 +3,13 @@ import { GridStack } from 'gridstack';
 var grid = GridStack.init();
 
 
+export function FormatString(str: string, ...val: string[]) {
+    for (let index = 0; index < val.length; index++) {
+      str = str.replace(`{${index}}`, val[index]);
+    }
+    return str;
+  }
+
 let items = [
     {x: 1, y: 1, w: 1, h: 1}, //, locked:true, content:"locked"},
   ];
@@ -10,8 +17,8 @@ let items = [
 
 function getNode() {
     let n = items[count] || {
-      x: Math.round(12 * Math.random()),
-      y: Math.round(5 * Math.random()),
+      x: 2,
+      y: 2,
       w: 2,
       h: 2
     };
@@ -156,10 +163,11 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
         const html = `<div class="built-in-agent-name">
                       ${agentName}
                     </div>
+                    {0}
                     `;
         return { html, data: innerData };
     }
-    return { html: "", data };
+    return { html: "{0}", data };
 }
 /**
  * Render plugin data
@@ -178,6 +186,7 @@ function renderPluginHeader(data: any): { html: string; data: any } {
 
 // Функция для отрисовки виджетов внутри объекта
 function renderPluginData(
+    template: string, 
     data: any,
     levelClass: number,
     isWarning: boolean
@@ -212,21 +221,21 @@ function renderPluginData(
         widgetClass += ` ${widgetSize}`;
 
         if (Object.keys(data).length === 1 && typeof item !== "string") {
-            html += renderList(item, levelClass+1);
+            html += renderList(item, levelClass+1, template);
         } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
-                    ${renderList(item, levelClass+1)}
+                    ${renderList(item, levelClass+1, template)}
                  </div>`;
         }
     }
-    return html;
+    return FormatString(template, html);
 }
 
 /**
  * Render plugins data recieved from server
  */
-function renderList(data: any, levelClass: number = 0): string {
+function renderList(data: any, levelClass: number = 0, template: string = "{0}"): string {
     if (data == null) return "";
 
     if (Array.isArray(data)) {
@@ -250,12 +259,12 @@ function renderList(data: any, levelClass: number = 0): string {
     html += pluginHtml;
     currentData = afterPluginData;
 
-    let pluginDataHtml = agentTitleHtml;
+    let pluginDataHtml = FormatString(template, agentTitleHtml);
 
-    if (!pluginHtml) {
-        pluginDataHtml += renderPluginData(currentData, levelClass+1, isWarning);
+    // if (!pluginHtml) {
+        pluginDataHtml = FormatString(pluginDataHtml, renderPluginData(agentTitleHtml, currentData, levelClass+1, isWarning));
         
-    }
+    // }
 
     if(pluginDataHtml.length > 0 && levelClass >= 1 && levelClass <= 2) {
         makeNewWidget(`${pluginDataHtml}`);
