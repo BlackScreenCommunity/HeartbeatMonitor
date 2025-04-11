@@ -1,6 +1,11 @@
 import 'gridstack/dist/gridstack.min.css';
 import { GridStack } from 'gridstack';
-var grid = GridStack.init();
+var grid = GridStack.init(
+    {
+        float: false,
+        layout: 'move'
+    }
+);
 
 
 export function FormatString(str: string, ...val: string[]) {
@@ -34,7 +39,7 @@ function makeNewWidget(innerHtml: string) {
 let n = getNode();
 let doc = document.implementation.createHTMLDocument();
 
-doc.body.innerHTML = `<div class="item" gs-x="${n.x}" gs-y="${n.y}" gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
+doc.body.innerHTML = `<div class="item"  gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
 let el = doc.body.children[0] as HTMLElement; 
 grid.el.appendChild(el);
 // example showing when DOM is created elsewhere (eg Angular/Vue/React) and GS is used to convert to a widget
