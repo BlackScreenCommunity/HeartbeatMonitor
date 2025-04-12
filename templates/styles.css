@@ -46,7 +46,7 @@ h1 {
 	padding: 20px;
 }
 
-.widget {
+.grid-stack-item-content {
 	background-color: var(--second-level-background-color);
 	padding: 15px;
 	border-radius: 5px;
@@ -72,7 +72,7 @@ h1 {
 }
 
 .widget-data {
-	font-size: 1em;
+	font-size: 1.5em;
 }
 
 .parent-warning {
@@ -227,3 +227,8 @@ h1 {
 	text-align: right;
 	color: var(--nord9);
 }
+
+/* .grid-stack { */
+/* 	background: var(--nord1); */
+/* } */
+
