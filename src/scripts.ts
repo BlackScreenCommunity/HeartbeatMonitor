@@ -1,5 +1,6 @@
 import 'gridstack/dist/gridstack.min.css';
 import { GridStack } from 'gridstack';
+
 var grid = GridStack.init(
     {
         float: false,
@@ -16,7 +17,7 @@ export function FormatString(str: string, ...val: string[]) {
   }
 
 let items = [
-    {x: 1, y: 1, w: 1, h: 1}, //, locked:true, content:"locked"},
+    { x: 1, y: 1, w: 1, h: 1 }, //, locked:true, content:"locked"},
   ];
   let count = 0;
 
@@ -42,7 +43,6 @@ let doc = document.implementation.createHTMLDocument();
 doc.body.innerHTML = `<div class="item"  gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
 let el = doc.body.children[0] as HTMLElement; 
 grid.el.appendChild(el);
-// example showing when DOM is created elsewhere (eg Angular/Vue/React) and GS is used to convert to a widget
 let w = grid.makeWidget(el);
 };
 
@@ -73,7 +73,7 @@ const config: MutationObserverInit = {
 };
 
 /** 
- * Start observing
+ * Start observing chancges in DOM
  **/
 observer.observe(targetNode, config);
 
@@ -159,6 +159,9 @@ function renderAgentSection(data: any): { html: string; data: any } {
     return { html: "", data };
 }
 
+/**
+ * Build html for agent title
+ */
 function renderAgentTitleForWidget(data: any): { html: string; data: any } {
     if ("agent_name" in data) {
         const agentName: string = data.agent_name;
@@ -174,8 +177,9 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
     }
     return { html: "{0}", data };
 }
+
 /**
- * Render plugin data
+ * Build html for plugin header
  */
 function renderPluginHeader(data: any): { html: string; data: any } {
     if (data && "plugin_name" in data) {
@@ -189,7 +193,9 @@ function renderPluginHeader(data: any): { html: string; data: any } {
     return { html: "", data };
 }
 
-// Функция для отрисовки виджетов внутри объекта
+/**
+ * Build html for plugin data
+ */
 function renderPluginData(
     template: string, 
     data: any,
@@ -226,11 +232,11 @@ function renderPluginData(
         widgetClass += ` ${widgetSize}`;
 
         if (Object.keys(data).length === 1 && typeof item !== "string") {
-            html += renderList(item, levelClass+1, template);
+            html += renderList(item, levelClass + 1, template);
         } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
-                    ${renderList(item, levelClass+1, template)}
+                    ${renderList(item, levelClass + 1, template)}
                  </div>`;
         }
     }
@@ -304,7 +310,9 @@ eventSource.onerror = function (event: Event) {
 
 const toggleSwitch = document.getElementById("toggleSwitch") as HTMLInputElement | null;
 
-// Add an event listener to the toggle switch when changed
+/**
+ * Add an event listener to the toggle switch when changed
+ */
 toggleSwitch?.addEventListener("change", hideNonWarningWidgets);
 
 /**
