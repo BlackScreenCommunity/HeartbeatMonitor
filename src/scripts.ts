@@ -11,39 +11,39 @@ var grid = GridStack.init(
 
 export function FormatString(str: string, ...val: string[]) {
     for (let index = 0; index < val.length; index++) {
-      str = str.replace(`{${index}}`, val[index]);
+        str = str.replace(`{${index}}`, val[index]);
     }
     return str;
-  }
+}
 
 let items = [
     { x: 1, y: 1, w: 1, h: 1 }, //, locked:true, content:"locked"},
-  ];
-  let count = 0;
+];
+let count = 0;
 
 function getNode() {
     let n = items[count] || {
-      x: 2,
-      y: 2,
-      w: 2,
-      h: 2
+        x: 2,
+        y: 2,
+        w: 2,
+        h: 2
     };
     count++;
     return n;
-  };
+};
 
 function addNewWidget() {
-let w = grid.addWidget(getNode());
+    let w = grid.addWidget(getNode());
 };
 
 function makeNewWidget(innerHtml: string) {
-let n = getNode();
-let doc = document.implementation.createHTMLDocument();
+    let n = getNode();
+    let doc = document.implementation.createHTMLDocument();
 
-doc.body.innerHTML = `<div class="item"  gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
-let el = doc.body.children[0] as HTMLElement; 
-grid.el.appendChild(el);
-let w = grid.makeWidget(el);
+    doc.body.innerHTML = `<div class="item"  gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
+    let el = doc.body.children[0] as HTMLElement;
+    grid.el.appendChild(el);
+    let w = grid.makeWidget(el);
 };
 
 
@@ -197,7 +197,7 @@ function renderPluginHeader(data: any): { html: string; data: any } {
  * Build html for plugin data
  */
 function renderPluginData(
-    template: string, 
+    template: string,
     data: any,
     levelClass: number,
     isWarning: boolean
@@ -263,27 +263,23 @@ function renderList(data: any, levelClass: number = 0, template: string = "{0}")
 
     let html = "";
 
-    const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);    // html += agentHtml;
+    const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);
     currentData = afterAgentData;
 
-    const { html: pluginHtml, data: afterPluginData } = renderPluginHeader(currentData);
-    html += pluginHtml;
+    const { html: pluginHeaderHtml, data: afterPluginData } = renderPluginHeader(currentData);
+    html += pluginHeaderHtml;
     currentData = afterPluginData;
+    html += FormatString(template, agentTitleHtml);
 
-    let pluginDataHtml = FormatString(template, agentTitleHtml);
+    let pluginDataHtml = renderPluginData(agentTitleHtml, currentData, levelClass + 1, isWarning)
 
-    // if (!pluginHtml) {
-        pluginDataHtml = FormatString(pluginDataHtml, renderPluginData(agentTitleHtml, currentData, levelClass+1, isWarning));
-        
-    // }
-
-    if(pluginDataHtml.length > 0 && levelClass >= 1 && levelClass <= 2) {
-        makeNewWidget(`${pluginDataHtml}`);
+    if (pluginDataHtml.length > 0 && levelClass >= 1 && levelClass <= 2) {
+        html = FormatString(html, pluginDataHtml);
+        makeNewWidget(`${html}`);
     }
 
-    return html;
+    return "";
 }
-
 
 /**
  * Container where data from the server 
