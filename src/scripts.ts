@@ -86,6 +86,8 @@ function processWarnings(): void {
     document.querySelectorAll("div.warning").forEach((el) => {
         el.parentElement?.classList.add("parent-warning");
     });
+
+    hideNonWarningWidgets();
 }
 
 /**
@@ -190,7 +192,7 @@ function renderPluginHeader(data: any): { html: string; data: any } {
                       <div class="plugin-name">${pluginName}</div>`;
         return { html, data: innerData };
     }
-    return { html: "", data };
+    return { html: "{0}", data };
 }
 
 /**
@@ -267,13 +269,13 @@ function renderList(data: any, levelClass: number = 0, template: string = "{0}")
     currentData = afterAgentData;
 
     const { html: pluginHeaderHtml, data: afterPluginData } = renderPluginHeader(currentData);
-    html += pluginHeaderHtml;
+    html = FormatString(html, pluginHeaderHtml);
     currentData = afterPluginData;
     html += FormatString(template, agentTitleHtml);
 
-    let pluginDataHtml = renderPluginData(agentTitleHtml, currentData, levelClass + 1, isWarning)
+    let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
 
-    if (pluginDataHtml.length > 0 && levelClass >= 1 && levelClass <= 2) {
+    if (pluginDataHtml.length > 0) {
         html = FormatString(html, pluginDataHtml);
         makeNewWidget(`${html}`);
     }
@@ -317,7 +319,7 @@ toggleSwitch?.addEventListener("change", hideNonWarningWidgets);
 function hideNonWarningWidgets(): void {
     if (!toggleSwitch) return;
 
-    const widgets = document.querySelectorAll<HTMLElement>(".outer.widget");
+    const widgets = document.querySelectorAll<HTMLElement>(".grid-stack-item-content");
 
     widgets.forEach((widget) => {
         if (!widget.classList.contains("parent-warning")) {
