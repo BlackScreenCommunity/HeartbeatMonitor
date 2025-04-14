@@ -137,7 +137,7 @@ function renderPrimitive(data: any): string {
  */
 function renderArray(data: any[]): string {
     const itemsHtml = data
-        .map((item) => `<div class="data_array_element">${renderList(item, 99)}</div>`)
+        .map((item) => `<div class="data_array_element">${renderWidgetData(item, 99)}</div>`)
         .join("");
     return `<div class="data_array">${itemsHtml}</div>`;
 }
@@ -234,11 +234,11 @@ function renderPluginData(
         widgetClass += ` ${widgetSize}`;
 
         if (Object.keys(data).length === 1 && typeof item !== "string") {
-            html += renderList(item, levelClass + 1, template);
+            html += renderWidgetData(item, levelClass + 1, template);
         } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
-                    ${renderList(item, levelClass + 1, template)}
+                    ${renderWidgetData(item, levelClass + 1, template)}
                  </div>`;
         }
     }
@@ -249,6 +249,30 @@ function renderPluginData(
  * Render plugins data recieved from server
  */
 function renderList(data: any, levelClass: number = 0, template: string = "{0}"): string {
+    if (data == null) return "";
+
+    let currentData = { ...data };
+    const isWarning: boolean = currentData.isWarning || false;
+    delete currentData.isWarning;
+
+    let html = "";
+
+    const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);
+    currentData = afterAgentData;
+
+    html += FormatString(template, agentTitleHtml);
+
+    let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
+
+    if (pluginDataHtml.length > 0) {
+        html = FormatString(html, pluginDataHtml);
+        makeNewWidget(`${html}`);
+    }
+
+    return "";
+}
+
+function renderWidgetData(data: any, levelClass: number = 0, template: string = "{0}"): string {
     if (data == null) return "";
 
     if (Array.isArray(data)) {
@@ -263,25 +287,18 @@ function renderList(data: any, levelClass: number = 0, template: string = "{0}")
     const isWarning: boolean = currentData.isWarning || false;
     delete currentData.isWarning;
 
-    let html = "";
-
-    const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);
-    currentData = afterAgentData;
-
-    const { html: pluginHeaderHtml, data: afterPluginData } = renderPluginHeader(currentData);
-    html = FormatString(html, pluginHeaderHtml);
-    currentData = afterPluginData;
-    html += FormatString(template, agentTitleHtml);
+    let html = template;
 
     let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
 
     if (pluginDataHtml.length > 0) {
-        html = FormatString(html, pluginDataHtml);
+        html = pluginDataHtml;
         makeNewWidget(`${html}`);
     }
 
     return "";
 }
+
 
 /**
  * Container where data from the server 
