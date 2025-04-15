@@ -233,14 +233,14 @@ function renderPluginData(
         }
         widgetClass += ` ${widgetSize}`;
 
-        if (Object.keys(data).length === 1 && typeof item !== "string") {
-            html += renderWidgetData(item, levelClass + 1, template);
-        } else {
+        // if (Object.keys(data).length === 1 && typeof item !== "string") {
+        //     html += renderWidgetData(item, levelClass + 1, template);
+        // } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
                     ${renderWidgetData(item, levelClass + 1, template)}
                  </div>`;
-        }
+        // }
     }
     return FormatString(template, html);
 }
@@ -287,16 +287,14 @@ function renderWidgetData(data: any, levelClass: number = 0, template: string = 
     const isWarning: boolean = currentData.isWarning || false;
     delete currentData.isWarning;
 
-    let html = template;
+    let pluginDataHtml = renderPluginData(template, currentData, levelClass + 1, isWarning)
 
-    let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
-
-    if (pluginDataHtml.length > 0) {
-        html = pluginDataHtml;
-        makeNewWidget(`${html}`);
+    if (pluginDataHtml.length > 0 && levelClass <= 2) {
+        makeNewWidget(`${pluginDataHtml}`);
+        return ""
     }
 
-    return "";
+    return pluginDataHtml;
 }
 
 

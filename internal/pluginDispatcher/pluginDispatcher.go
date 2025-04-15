@@ -59,13 +59,8 @@ func CollectAll() map[string]interface{} {
 			fmt.Printf("Error collecting data from plugin %s: %v\n", name, err)
 			continue
 		}
-		if len(data) == 1 {
-			for _, value := range data {
-				pluginResultCollection[plugin.Name()] = value
-			}
-		} else {
-			pluginResultCollection[plugin.Name()] = data
-		}
+
+		pluginResultCollection[plugin.Name()] = data
 	}
 	return pluginResultCollection
 }
