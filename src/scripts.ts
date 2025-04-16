@@ -183,16 +183,10 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
 /**
  * Build html for plugin header
  */
-function renderPluginHeader(data: any): { html: string; data: any } {
-    if (data && "plugin_name" in data) {
-        const pluginName: string = data.plugin_name;
+function renderPluginHeader(pluginName: string): string {
+        const html = `<div class="plugin-name">${pluginName}</div>{0}`;
+        return html;
 
-        const innerData = data.data;
-        const html = `<div class="plugin-data">
-                      <div class="plugin-name">${pluginName}</div>`;
-        return { html, data: innerData };
-    }
-    return { html: "{0}", data };
 }
 
 /**
@@ -204,6 +198,8 @@ function renderPluginData(
     levelClass: number,
     isWarning: boolean
 ): string {
+
+    
     let html = "";
     for (const key in data) {
         if (!data.hasOwnProperty(key)) continue;
@@ -233,14 +229,15 @@ function renderPluginData(
         }
         widgetClass += ` ${widgetSize}`;
 
-        // if (Object.keys(data).length === 1 && typeof item !== "string") {
-        //     html += renderWidgetData(item, levelClass + 1, template);
-        // } else {
+        if (Object.keys(data).length === 1 && typeof item !== "string") {
+
+            html += renderWidgetData(item, levelClass + 1, renderPluginHeader(Object.keys(data)[0]));
+        } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>
                     ${renderWidgetData(item, levelClass + 1, template)}
                  </div>`;
-        // }
+        }
     }
     return FormatString(template, html);
 }
@@ -263,11 +260,6 @@ function renderList(data: any, levelClass: number = 0, template: string = "{0}")
     html += FormatString(template, agentTitleHtml);
 
     let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
-
-    if (pluginDataHtml.length > 0) {
-        html = FormatString(html, pluginDataHtml);
-        makeNewWidget(`${html}`);
-    }
 
     return "";
 }
