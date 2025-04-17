@@ -2,20 +2,26 @@ package webServer
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"math"
+	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -24,17 +30,21 @@ var ServerInfo = applicationConfigurationDispatcher.ServerInfo{}
 func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfig, serverInfo applicationConfigurationDispatcher.ServerInfo) {
 	ServerInfo = serverInfo
 
-	InitEndpoints()
-	StartServer(webServerConfig)
+	mux := InitEndpoints()
+	StartServer(mux, webServerConfig)
 }
 
 // Defines enpoint handlers
-func InitEndpoints() {
-	http.HandleFunc("/plugins/results", basicAuthMiddleware(GetPluginResultsHandler))
-	http.HandleFunc("/", IndexPageHandler)
-	http.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
-	http.HandleFunc("/events", sseHandler)
-	http.HandleFunc("/styles.css", serveMergedCSS)
+func InitEndpoints() *http.ServeMux {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/plugins/results", basicAuthMiddleware(GetPluginResultsHandler))
+	mux.HandleFunc("/", IndexPageHandler)
+	mux.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
+	mux.HandleFunc("/events", sseHandler)
+	mux.HandleFunc("/styles.css", serveMergedCSS)
+
+	return mux
 }
 
 func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
@@ -44,11 +54,44 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 	responseWriter.Write([]byte(string(pluginResultCollection)))
 }
 
-func StartServer(config applicationConfigurationDispatcher.WebServerConfig) {
-	fmt.Println("Server is running on port " + strconv.Itoa(config.Port))
-	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
-		fmt.Printf("Failed to start server: %v\n", err)
+func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebServerConfig) error {
+	if mux == nil {
+		return errors.New("mux must not be nil")
 	}
+
+	if cfg.Port <= 0 || cfg.Port > 65535 {
+		return fmt.Errorf("invalid port: %d", cfg.Port)
+	}
+
+	addr := net.JoinHostPort("", strconv.Itoa(cfg.Port))
+
+	srv := &http.Server{
+		Addr:     addr,
+		Handler:  mux,
+		ErrorLog: log.New(os.Stdout, "http: ", log.LstdFlags),
+	}
+
+	// Graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-stop
+		log.Printf("Shutdown signal received, stopping server…")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Printf("Error during shutdown: %v", err)
+		}
+	}()
+
+	log.Printf("Server starting on %s", addr)
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return fmt.Errorf("could not start server: %w", err)
+	}
+
+	log.Printf("Server stopped")
+	return nil
 }
 
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
