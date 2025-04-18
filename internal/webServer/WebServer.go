@@ -95,6 +95,12 @@ func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebS
 }
 
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
+
+	if r.URL.Path != "/" {
+		http.NotFound(responseWriter, r)
+		return
+	}
+
 	totalResults := make(map[string]interface{})
 
 	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{
