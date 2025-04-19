@@ -71,7 +71,18 @@ func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebS
 		ErrorLog: log.New(os.Stdout, "http: ", log.LstdFlags),
 	}
 
-	// Graceful shutdown
+	OnServerStopping(srv)
+
+	log.Printf("Server starting on %s", addr)
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return fmt.Errorf("could not start server: %w", err)
+	}
+
+	log.Printf("Server stopped")
+	return nil
+}
+
+func OnServerStopping(srv *http.Server) {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
@@ -84,14 +95,6 @@ func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebS
 			log.Printf("Error during shutdown: %v", err)
 		}
 	}()
-
-	log.Printf("Server starting on %s", addr)
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("could not start server: %w", err)
-	}
-
-	log.Printf("Server stopped")
-	return nil
 }
 
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
