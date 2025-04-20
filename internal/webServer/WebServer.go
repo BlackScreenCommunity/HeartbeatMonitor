@@ -39,6 +39,11 @@ func InitEndpoints() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/plugins/results", basicAuthMiddleware(GetPluginResultsHandler))
+
+	if ServerInfo.AgentMode {
+		return mux
+	}
+
 	mux.HandleFunc("/", IndexPageHandler)
 	mux.Handle("/templates/", http.StripPrefix("/templates", http.FileServer(http.Dir("./templates"))))
 	mux.HandleFunc("/events", sseHandler)

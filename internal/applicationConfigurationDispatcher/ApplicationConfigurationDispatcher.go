@@ -9,9 +9,10 @@ import (
 
 // Defines the local agent name
 type ServerInfo struct {
-	Name     string
-	Login    string
-	Password string
+	Name      string
+	Login     string
+	Password  string
+	AgentMode bool
 }
 
 // Parameters for the web interface
