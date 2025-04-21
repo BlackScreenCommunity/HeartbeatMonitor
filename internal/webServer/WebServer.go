@@ -105,10 +105,14 @@ func OnServerStopping(srv *http.Server) {
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
-		http.NotFound(responseWriter, r)
+		responseWriter.WriteHeader(http.StatusNotFound)
+		tmpl404 := template.Must(template.
+			New("NotFound.html").
+			Funcs(template.FuncMap{"serverInfo": getServerName}).
+			ParseFiles("templates/NotFound.html"))
+		tmpl404.Execute(responseWriter, ServerInfo)
 		return
 	}
-
 	totalResults := make(map[string]interface{})
 
 	pageTemplate := template.Must(template.New("index.html").Funcs(template.FuncMap{

@@ -198,3 +198,8 @@ h1 {
     padding-bottom: 1em;
     font-weight: bold;;
 }
+
+.notFound {
+	text-align: center;
+	color: var(--nord11);
+}
