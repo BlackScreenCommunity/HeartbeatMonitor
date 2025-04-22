@@ -194,12 +194,29 @@ h1 {
 
 .built-in-agent-name {
 	font-size: large;
-    color: var(--nord15);
-    padding-bottom: 1em;
-    font-weight: bold;;
+	color: var(--nord15);
+	padding-bottom: 1em;
+	font-weight: bold;
+	;
 }
 
-.notFound {
+.notFoundContainer {
 	text-align: center;
 	color: var(--nord11);
+}
+
+.notFoundCaption {
+	text-align: center;
+	color: var(--nord13);
+}
+
+
+.btn {
+	display: inline-block;
+	margin-top: 1rem;
+	padding: .75rem 1.5rem;
+	text-decoration: none;
+	border-radius: .5rem;
+	background: var(--nord10);
+	color: var(--nord4);
 }
