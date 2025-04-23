@@ -329,8 +329,8 @@ function hideNonWarningWidgets(): void {
     const widgets = document.querySelectorAll<HTMLElement>(".grid-stack-item-content");
 
     widgets.forEach((widget) => {
-        if (!widget.classList.contains("parent-warning")) {
-            widget.style.display = toggleSwitch.checked ? "none" : "";
+        if (!widget.classList.contains("parent-warning") && widget.parentElement) {
+            widget.parentElement.style.display = toggleSwitch.checked ? "none" : "";
         }
     });
 }
