@@ -4,7 +4,9 @@ import { GridStack } from 'gridstack';
 var grid = GridStack.init(
     {
         float: false,
-        layout: 'move'
+        layout: 'move',
+        staticGrid: false,
+        minRow: 2
     }
 );
 

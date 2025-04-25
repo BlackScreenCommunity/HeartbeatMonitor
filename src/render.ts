@@ -20,25 +20,6 @@ function renderArray(data: any[]): string {
 }
 
 /**
- * Render agent's plugins data
- */
-function renderAgentSection(data: any): { html: string; data: any } {
-    if ("agent_name" in data) {
-        const agentName: string = data.agent_name;
-        const duration: number = data.duration;
-
-        const innerData = data.data;
-        const html = `<div class="agent-name">
-                      ${agentName}
-                      <div class="timer agent-duration">Loading time ${duration} seconds</div>
-                    </div>
-                    <div class="agent-data">`;
-        return { html, data: innerData };
-    }
-    return { html: "", data };
-}
-
-/**
  * Build html for agent title
  */
 function renderAgentTitleForWidget(data: any): { html: string; data: any } {
@@ -75,7 +56,6 @@ function renderPluginData(
     levelClass: number,
     isWarning: boolean
 ): string {
-
     
     let html = "";
     for (const key in data) {
@@ -119,7 +99,6 @@ function renderPluginData(
     return Utils.FormatString(template, html);
 }
 
-
 /**
  * Render plugins data recieved from server
  */
@@ -142,6 +121,10 @@ export function renderList(data: any, levelClass: number = 0, template: string =
     return "";
 }
 
+/**
+ * Render widget data based on its type (Array, nested widget data or primitive value)
+ * Return rendered HTML or an empty string if a new widget is created.
+ */
 function renderWidgetData(data: any, levelClass: number = 0, template: string = "{0}"): string {
     if (data == null) return "";
 
@@ -167,8 +150,10 @@ function renderWidgetData(data: any, levelClass: number = 0, template: string = 
     return pluginDataHtml;
 }
 
-
-const toggleSwitch = document.getElementById("toggleSwitch") as HTMLInputElement | null;
+/**
+ * A "Show Only Warnings" toggle switch element
+ */
+const toggleSwitch = document.getElementById("show_only_warnings_checkbox") as HTMLInputElement | null;
 
 /**
  * Add an event listener to the toggle switch when changed
