@@ -28,10 +28,13 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
         const duration: number = data.duration;
 
         const innerData = data.data;
-        const html = `<div class="built-in-agent-name">
-                      ${agentName}
+        const html = `
+                    <div class="widget-content" data-group="${agentName}">
+                        <div class="built-in-agent-name">
+                            ${agentName}
+                        </div>
+                        {0}
                     </div>
-                    {0}
                     `;
         return { html, data: innerData };
     }
@@ -56,7 +59,6 @@ function renderPluginData(
     levelClass: number,
     isWarning: boolean
 ): string {
-    
     let html = "";
     for (const key in data) {
         if (!data.hasOwnProperty(key)) continue;
@@ -116,7 +118,7 @@ export function renderList(data: any, levelClass: number = 0, template: string =
 
     html += Utils.FormatString(template, agentTitleHtml);
 
-    let pluginDataHtml = renderPluginData(html, currentData, levelClass + 1, isWarning)
+    renderPluginData(html, currentData, levelClass + 1, isWarning)
 
     return "";
 }
