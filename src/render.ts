@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-explicit-any: 0 */
+
 import * as Utils from './utils';
 import {makeNewWidget} from './gridStackHandler'
 
@@ -5,14 +7,14 @@ import {makeNewWidget} from './gridStackHandler'
 /**
  * Render simple widget data, like text, number, etc
  */
-function renderPrimitive(data: any): string {
+function renderPrimitive(data: object): string {
     return `<div class="widget-data">${data}</div>`;
 }
 
 /**
  Render set of widget indicators
  */
-function renderArray(data: any[]): string {
+function renderArray(data: object[]): string {
     const itemsHtml = data
         .map((item) => `<div class="data_array_element">${renderWidgetData(item, 99)}</div>`)
         .join("");
@@ -25,7 +27,6 @@ function renderArray(data: any[]): string {
 function renderAgentTitleForWidget(data: any): { html: string; data: any } {
     if ("agent_name" in data) {
         const agentName: string = data.agent_name;
-        const duration: number = data.duration;
 
         const innerData = data.data;
         const html = `
@@ -104,8 +105,8 @@ function renderPluginData(
 /**
  * Render plugins data recieved from server
  */
-export function renderList(data: any, levelClass: number = 0, template: string = "{0}"): string {
-    if (data == null) return "";
+export function renderList(data: any, levelClass: number = 0, template: string = "{0}"): void {
+    if (data == null) return;
 
     let currentData = { ...data };
     const isWarning: boolean = currentData.isWarning || false;
@@ -115,12 +116,9 @@ export function renderList(data: any, levelClass: number = 0, template: string =
 
     const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);
     currentData = afterAgentData;
-
     html += Utils.FormatString(template, agentTitleHtml);
 
-    renderPluginData(html, currentData, levelClass + 1, isWarning)
-
-    return "";
+    renderPluginData(html, currentData, levelClass + 1, isWarning);
 }
 
 /**
