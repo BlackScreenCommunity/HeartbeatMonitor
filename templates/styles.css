@@ -224,4 +224,6 @@ h1 {
 	border-radius: .5rem;
 	background: var(--nord10);
 	color: var(--nord4);
+	margin: 0.5em;
+    cursor: default;
 }

@@ -42,6 +42,23 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
     return { html: "{0}", data };
 }
 
+function addAgentToSwitcher(data: any): void {
+    if ("agent_name" in data) {
+        const agentName: string = data.agent_name;
+
+        const agentSwitcher = document.getElementById("agent-switcher");
+
+        if (agentSwitcher) {
+            agentSwitcher.insertAdjacentHTML(
+                "afterend",
+                `<div class="agent-toggle btn">
+                    ${agentName}
+                </div>`
+            );
+        }
+    }
+}
+
 /**
  * Build html for plugin header
  */
@@ -114,6 +131,8 @@ export function renderList(data: any, levelClass: number = 0, template: string =
 
     let html = "";
 
+    addAgentToSwitcher(currentData);
+    
     const { html: agentTitleHtml, data: afterAgentData } = renderAgentTitleForWidget(currentData);
     currentData = afterAgentData;
     html += Utils.FormatString(template, agentTitleHtml);
