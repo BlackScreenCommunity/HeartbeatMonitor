@@ -45,16 +45,24 @@ function renderAgentTitleForWidget(data: any): { html: string; data: any } {
 function addAgentToSwitcher(data: any): void {
     if ("agent_name" in data) {
         const agentName: string = data.agent_name;
-
         const agentSwitcher = document.getElementById("agent-switcher");
 
         if (agentSwitcher) {
+            const id = `agent-switcher-${crypto.randomUUID()}`;
             agentSwitcher.insertAdjacentHTML(
-                "afterend",
-                `<div class="agent-toggle btn">
+                "beforeend",
+                `<div class="agent-toggle btn" id="${id}">
                     ${agentName}
                 </div>`
             );
+
+            const agentSwitcherElement = document.getElementById(id);
+            if (agentSwitcherElement) {
+                agentSwitcherElement.addEventListener("click", () => {
+                    // console.log("Clicked on:", agentName);
+                    agentSwitcherElement.classList.toggle("active");
+                });
+            }
         }
     }
 }

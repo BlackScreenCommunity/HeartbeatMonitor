@@ -227,3 +227,8 @@ h1 {
 	margin: 0.5em;
     cursor: default;
 }
+
+#agent-switcher {
+	margin-left: 3em;
+	margin-right: 3em;
+}
