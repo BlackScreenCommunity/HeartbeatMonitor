@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
-	"strconv"
 	"time"
 )
 
@@ -41,7 +40,7 @@ func GetMetricsFromAgents() map[string]interface{} {
 					Key    string
 					Result map[string]interface{}
 				}{
-					Key:    strconv.Itoa(i+1) + ". " + agent.Name,
+					Key:    agent.Name,
 					Result: result,
 				}
 			}(i, agent)

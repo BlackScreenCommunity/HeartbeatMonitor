@@ -177,7 +177,7 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 					Result   map[string]interface{}
 					Duration float64
 				}{
-					Key:      strconv.Itoa(i+1) + ". " + agent.Name,
+					Key:      agent.Name,
 					Result:   result,
 					Duration: math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
 				}

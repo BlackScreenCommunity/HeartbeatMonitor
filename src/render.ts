@@ -49,12 +49,18 @@ function addAgentToSwitcher(data: any): void {
 
         if (agentSwitcher) {
             const agentDiv = document.createElement("div");
-            agentDiv.classList.add("agent-toggle", "btn");
+            agentDiv.classList.add("agent-toggle", "btn", "active");
             agentDiv.textContent = agentName;
 
             agentDiv.addEventListener("click", () => {
-                console.log("Clicked on:", agentName);
                 agentDiv.classList.toggle("active");
+               
+                const widgets = document.querySelectorAll<HTMLElement>(`[data-group="${agentName}"]`);
+                widgets.forEach((widget) => {
+                    if (widget.parentElement && widget.parentElement.parentElement) {
+                        widget.parentElement.parentElement.classList.toggle("hidden");
+                    }
+                });
             });
 
             agentSwitcher.appendChild(agentDiv);
@@ -195,4 +201,9 @@ export function hideNonWarningWidgets(): void {
             widget.parentElement.style.display = toggleSwitch.checked ? "none" : "";
         }
     });
+
+    const agentSwitcher = document.getElementById("agent-switcher");
+    if(agentSwitcher) {
+        agentSwitcher.classList.toggle("hidden");
+    }
 }
