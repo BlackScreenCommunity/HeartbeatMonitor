@@ -48,21 +48,16 @@ function addAgentToSwitcher(data: any): void {
         const agentSwitcher = document.getElementById("agent-switcher");
 
         if (agentSwitcher) {
-            const id = `agent-switcher-${crypto.randomUUID()}`;
-            agentSwitcher.insertAdjacentHTML(
-                "beforeend",
-                `<div class="agent-toggle btn" id="${id}">
-                    ${agentName}
-                </div>`
-            );
+            const agentDiv = document.createElement("div");
+            agentDiv.classList.add("agent-toggle", "btn");
+            agentDiv.textContent = agentName;
 
-            const agentSwitcherElement = document.getElementById(id);
-            if (agentSwitcherElement) {
-                agentSwitcherElement.addEventListener("click", () => {
-                    // console.log("Clicked on:", agentName);
-                    agentSwitcherElement.classList.toggle("active");
-                });
-            }
+            agentDiv.addEventListener("click", () => {
+                console.log("Clicked on:", agentName);
+                agentDiv.classList.toggle("active");
+            });
+
+            agentSwitcher.appendChild(agentDiv);
         }
     }
 }
