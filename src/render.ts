@@ -49,7 +49,7 @@ function addAgentToSwitcher(data: any): void {
 
         if (agentSwitcher) {
             const agentDiv = document.createElement("div");
-            agentDiv.classList.add("agent-toggle", "btn", "active");
+            agentDiv.classList.add("agent-toggle", "btn", "active", "noselect");
             agentDiv.textContent = agentName;
 
             agentDiv.addEventListener("click", () => {
