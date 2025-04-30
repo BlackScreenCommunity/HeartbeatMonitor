@@ -222,10 +222,11 @@ h1 {
 	padding: .75rem 1.5rem;
 	text-decoration: none;
 	border-radius: .5rem;
-	background: var(--nord2);
+	background: var(--nord3);
 	color: var(--nord4);
 	margin: 0.5em;
     cursor: default;
+	font-size: 1.3em;
 }
 
 .btn.active {
@@ -235,7 +236,10 @@ h1 {
 
 #agent-switcher {
 	margin-left: 3em;
-	margin-right: 3em;
+    margin-right: 3em;
+    background-color: var(--nord1);
+    border-radius: 1em;
+    margin-top: 1em;
 }
 
 .hidden {
