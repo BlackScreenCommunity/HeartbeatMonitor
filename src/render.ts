@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
 import * as Utils from './utils';
-import {makeNewWidget} from './gridStackHandler'
+import {makeNewWidget, getGrid} from './gridStackHandler'
 
 
 /**
@@ -206,4 +206,26 @@ export function hideNonWarningWidgets(): void {
     if(agentSwitcher) {
         agentSwitcher.classList.toggle("hidden");
     }
+
+    removePlaceHolders();
 }
+
+
+function removePlaceHolders () {
+    const placeholders = document.querySelectorAll<HTMLElement>(".placeholder");
+
+    placeholders.forEach((placeholder) => {
+        if(placeholder.parentElement) {
+            removePlaceholderWithFadeOut(placeholder.parentElement);
+        }
+    });
+}
+
+function removePlaceholderWithFadeOut(el: HTMLElement) {
+    el.firstElementChild?.classList.add('fade-out');
+    
+    el.addEventListener('transitionend', () => {
+      el.remove();
+      getGrid()?.removeWidget(el, false);
+    }, { once: true });
+  }
