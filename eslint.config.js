@@ -17,5 +17,6 @@ export default [{
     },
     rules: {
         ...eslintPluginTs.configs.recommended.rules,
+        "no-debugger": "error"
     },
 }];
