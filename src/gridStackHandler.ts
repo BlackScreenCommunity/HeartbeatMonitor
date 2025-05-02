@@ -22,7 +22,7 @@ export function makeNewWidget(innerHtml: string) {
     grid.makeWidget(el);
 };
 
-function createPlaceholdersWidgets() {
+export function createPlaceholdersWidgets() {
     grid.on('added', function (e, items) {
         for (let i = 0; i < items.length; i++) {
             if (items[i] && items[i].el && items[i].el?.firstElementChild) {

@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
 import * as Utils from './utils';
-import {makeNewWidget, getGrid} from './gridStackHandler'
+import {makeNewWidget, getGrid, createPlaceholdersWidgets} from './gridStackHandler'
 
 
 /**
@@ -147,6 +147,10 @@ export function renderList(data: any, levelClass: number = 0, template: string =
     html += Utils.FormatString(template, agentTitleHtml);
 
     renderPluginData(html, currentData, levelClass + 1, isWarning);
+
+    removePlaceHolders();
+    createPlaceholdersWidgets();
+    
 }
 
 /**
@@ -216,16 +220,9 @@ function removePlaceHolders () {
 
     placeholders.forEach((placeholder) => {
         if(placeholder.parentElement) {
-            removePlaceholderWithFadeOut(placeholder.parentElement);
+            placeholder.parentElement.remove();
+            getGrid()?.removeWidget(placeholder.parentElement, false);
         }
+
     });
 }
-
-function removePlaceholderWithFadeOut(el: HTMLElement) {
-    el.firstElementChild?.classList.add('fade-out');
-    
-    el.addEventListener('transitionend', () => {
-      el.remove();
-      getGrid()?.removeWidget(el, false);
-    }, { once: true });
-  }
