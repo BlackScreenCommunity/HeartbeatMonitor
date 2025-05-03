@@ -1,27 +1,10 @@
-import {renderList, hideNonWarningWidgets} from './render'
-
+import { initGrid } from './gridStackHandler';
+import './sseHandler';
 
 /**
- * Create an EventSource to receive 
- * server-sent events to the "/events" endpoint.
+ * Initialize grid with placeholder widgets
  */
-const eventSource = new EventSource("/events");
+initGrid();
 
-/**
- * Subscribe to Server-Sent Events (SSE)
- * Parse the received agent data as JSON and renders it on the page
- **/
-eventSource.onmessage = function (event: MessageEvent) {
-    const jsonData = JSON.parse(event.data);
-    renderList(jsonData, 0);
-};
-
-/**
- * Closes the SSE connection
- **/
-eventSource.onerror = function () {
-    eventSource.close();
-    hideNonWarningWidgets();
-};
 
 

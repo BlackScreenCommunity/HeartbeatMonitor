@@ -150,7 +150,6 @@ export function renderList(data: any, levelClass: number = 0, template: string =
 
     removePlaceHolders();
     createPlaceholdersWidgets();
-    
 }
 
 /**
@@ -223,6 +222,5 @@ function removePlaceHolders () {
             placeholder.parentElement.remove();
             getGrid()?.removeWidget(placeholder.parentElement, false);
         }
-
     });
 }
