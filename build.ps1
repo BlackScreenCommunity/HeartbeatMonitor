@@ -2,6 +2,12 @@ $targets = @(
     @{ GOOS="linux"; GOARCH="amd64" }
 )
 
+
+function BuildFrontendBundle {
+    Write-Host "Building JavaScript bundle"
+    npm run bundle
+}
+
 # Function: Copy-FilesByExtension
 # This function finds and copies all files with a given extension from one folder to another.
 # It avoids copying files that are already in the destination folder.
@@ -35,6 +41,7 @@ function Copy-FilesByExtension {
     }
 }
 
+BuildFrontendBundle
 
 foreach ($target in $targets) {
     $env:GOOS = $target.GOOS
