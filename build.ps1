@@ -2,6 +2,13 @@ $targets = @(
     @{ GOOS="linux"; GOARCH="amd64" }
 )
 
+function Get-ApplicationVersion {
+    $commitHash = (git rev-parse HEAD).Substring(0,8)
+    $versionDatePart = [System.DateTime]::Now.ToString('yyyyMMdd.HHmm')
+    $version = "1.$versionDatePart-commit-$commitHash"
+
+    return $version
+}
 
 function BuildFrontendBundle {
     Write-Host "Building JavaScript bundle"
@@ -42,6 +49,9 @@ function Copy-FilesByExtension {
 }
 
 BuildFrontendBundle
+
+$version = Get-ApplicationVersion 
+(Get-Content ./internal/plugins/VersionPlugin.go).Replace('#app-version#', $version) | Set-Content ./internal/plugins/VersionPlugin.go
 
 foreach ($target in $targets) {
     $env:GOOS = $target.GOOS
