@@ -116,8 +116,9 @@ function renderPluginData(
         widgetClass += ` ${widgetSize}`;
 
         if (Object.keys(data).length === 1 && typeof item !== "string") {
-
+            html += `<div class="${levelClass} ${widgetClass}"`;
             html += renderWidgetData(item, levelClass + 1, renderPluginHeader(Object.keys(data)[0]));
+            html += `</div>`;
         } else {
             html += `<div class="${levelClass} ${widgetClass}">
                     <div class="widget-title">${key}:</div>

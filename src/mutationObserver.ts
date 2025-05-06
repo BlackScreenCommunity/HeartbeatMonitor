@@ -6,7 +6,7 @@ import {hideNonWarningWidgets} from './render'
  **/
 function processWarnings(): void {
     document.querySelectorAll("div.warning").forEach((el) => {
-        el.parentElement?.classList.add("parent-warning");
+        el.parentElement?.parentElement?.classList.add("parent-warning");
     });
 
     hideNonWarningWidgets();
