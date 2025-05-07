@@ -6,3 +6,10 @@ export function FormatString(str: string, ...val: string[]) {
     
     return str;
 }
+
+export function GetOccurencesCount(text: string, search: string) { 
+    let trimmedText = text.replace(/ /g, '');
+    let trimmedSearch = search.replace(/ /g, '');
+
+    return (trimmedText.match(new RegExp(trimmedSearch, 'g')) || []).length;
+}

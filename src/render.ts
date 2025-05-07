@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
 import * as Utils from './utils';
-import {makeNewWidget, getGrid, createPlaceholdersWidgets} from './gridStackHandler'
+import {makeNewWidget, makeNewBigWidget, getGrid, createPlaceholdersWidgets} from './gridStackHandler'
 
 
 /**
@@ -91,7 +91,7 @@ function renderPluginData(
         if (!data.hasOwnProperty(key)) continue;
 
         let item = data[key];
-        let widgetClass = `widget${isWarning ? " warning" : ""}`;
+        let widgetClass = `${isWarning ? " warning" : ""} widget`;
         let pluginType = "";
 
         if (typeof item === "object" && item && "Type" in item) {
@@ -175,7 +175,15 @@ function renderWidgetData(data: any, levelClass: number = 0, template: string = 
     let pluginDataHtml = renderPluginData(template, currentData, levelClass + 1, isWarning)
 
     if (pluginDataHtml.length > 0 && levelClass <= 2) {
-        makeNewWidget(`${pluginDataHtml}`);
+
+        
+
+
+        if(Utils.GetOccurencesCount(pluginDataHtml, "widget small") < 10) {
+            makeNewWidget(`${pluginDataHtml}`);
+        } else {
+            makeNewBigWidget(`${pluginDataHtml}`);
+        }
         return ""
     }
 

@@ -30,8 +30,23 @@ export function initGrid () {
  * Add new widget on a grid with html content
  */
 export function makeNewWidget(innerHtml: string) {
+    createWidget(innerHtml, 2, 2);
+};
+
+/**
+ * Add new doubled size widget on a grid with html content
+ */
+export function makeNewBigWidget(innerHtml: string) {
+    createWidget(innerHtml, 4, 4);
+}
+
+/**
+ * Add new widget on a grid with html content
+ * with specified parameters
+ */
+function createWidget(innerHtml: string, height: number, width: number) {
     let doc = document.implementation.createHTMLDocument();
-    doc.body.innerHTML = `<div class="item"  gs-w="${2}" gs-h="${2}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
+    doc.body.innerHTML = `<div class="item"  gs-w="${width}" gs-h="${height}"><div class="grid-stack-item-content">${innerHtml}</div></div>`;
     let el = doc.body.children[0] as HTMLElement;
     grid.el.appendChild(el);
     grid.makeWidget(el);
