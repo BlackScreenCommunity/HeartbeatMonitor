@@ -1,0 +1,8 @@
+node_modules
+dist
+Release
+.git
+*.log
+Dockerfile
+docker-compose.yml
+*.zip
