@@ -67,15 +67,18 @@ WantedBy=multi-user.target
 
 Работоспособность плагинов
 
-| Плагин                                           | Статус                                      |
-| ------------------------------------------------ | ------------------------------------------- |
-| Плагин отображения версии запущенного приложения | Работает                                    |
-| HardDriveFreeSpacePlugin                         | Не работает                                 |
-| PostgreSqlQueryPlugin                            | Работает                                    |
-| FolderSizePlugin                                 | Не работает                                 |
-| ServerTimePlugin                                 | Не работает, но отображает время контейнера |
-| ServiceStatusPlugin                              | Не работает                                 |
-| DockerContainerStatusPlugin                      | Не работает                                 |
+
+
+| Плагин                                           | Статус                                   | Комментарий                                                                                                                                   |
+| ------------------------------------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Плагин отображения версии запущенного приложения | Работает                                 |                                                                                                                                               |
+| Плагин отслеживания свободного места на диске    | Не работает                              | [WIP] Работает при монтировании корневого каталога на чтение                                                                                  |
+| Плагин взаимодействия с PostgreSQL               | Работает                                 |                                                                                                                                               |
+| Плагин отслеживания размера каталога             | Не работает                              | [WIP] Работает при монтировании корневого каталога на чтение                                                                                  |
+| GПлагин отображения серверного времени            | Работает, но отображает время контейнера | [Research]                                                                                                                                    |
+| Плагин отображения сервисов systemd              | Работает, с дополнительными условиями    | Работает при монтировании D-Bus-сокета  --security-opt apparmor=unconfined \, -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro \ |
+| Плагин отображения состояния Docker-контейнеров  | Работает, с дополнительными условиями    | Работает при монтировании Docker-сокет  -v /var/run/docker.sock:/var/run/docker.sock \                                                        |
+
 
 Единственное возможное использование в текущей версии: 
 - агенты запускаются на удаленных серверах нативно
@@ -84,10 +87,13 @@ WantedBy=multi-user.target
 ### Сборка Docker-image
 
 ``` shell
-docker build \
-    --build-arg COMMIT_HASH="App_in_docker" \
-    --build-arg VERSION_DATE_PART=$(date +%Y%m%d.%H%M) \
-    -t heartbeatmonitor:latest .
+docker run -d \
+    -p 80:80 \
+    --name heartbeatmonitor \
+    --security-opt apparmor=unconfined \
+    -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    heartbeatmonitor:latest
 ```
 
 ### Запуск Docker-container
