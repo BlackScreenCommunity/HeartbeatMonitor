@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
@@ -8,7 +9,12 @@ import (
 )
 
 func main() {
-	applicationConfiguration, shouldReturn := applicationConfigurationDispatcher.GetConfigFromFile()
+	var configFilePath string
+	flag.StringVar(&configFilePath, "configFilePath", "appsettings.json", "Path to config file")
+
+	flag.Parse()
+
+	applicationConfiguration, shouldReturn := applicationConfigurationDispatcher.GetConfigFromFile(configFilePath)
 	if shouldReturn {
 		return
 	}

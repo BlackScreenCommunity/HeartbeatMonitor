@@ -3,6 +3,7 @@ package applicationConfigurationDispatcher
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"project/internal/pluginDispatcher"
 )
@@ -40,9 +41,9 @@ type ApplicationConfiguration struct {
 }
 
 // Reads application's configuration
-// from appsettings.json
-func GetConfigFromFile() (ApplicationConfiguration, bool) {
-	pluginsConfig, err := loadConfigFromFile()
+// from file located at the path
+func GetConfigFromFile(configFilePath string) (ApplicationConfiguration, bool) {
+	pluginsConfig, err := loadConfigFromFile(configFilePath)
 	if err != nil {
 		fmt.Printf("Error loading configuration: %v\n", err)
 		return ApplicationConfiguration{}, true
@@ -53,11 +54,13 @@ func GetConfigFromFile() (ApplicationConfiguration, bool) {
 // Handles operations with file.
 // Tries to search and decode JSON object to
 // Application Configuration
-func loadConfigFromFile() (ApplicationConfiguration, error) {
-	file, err := os.Open("appsettings.json")
+func loadConfigFromFile(configFilePath string) (ApplicationConfiguration, error) {
+	file, err := os.Open(configFilePath)
 	if err != nil {
+		log.Fatalf("Cannot read config file %s: %v", configFilePath, err)
 		return ApplicationConfiguration{}, fmt.Errorf("error opening config file: %v", err)
 	}
+
 	defer file.Close()
 
 	var data ApplicationConfiguration

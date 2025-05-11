@@ -34,7 +34,28 @@ wget ftp://185.246.118.224/HeartBeatMonitor-linux-amd64.zip -O HeartBeatMonitor-
 && sudo systemctl restart hbm.service
 ```
 
+## Запуск приложения
 
+### Входные параметры
+
+Актуальные параметры для запуска можно посмотреть при помощи команды:
+
+``` shell
+./HeartBeatMonitor-linux-amd64 -h
+```
+
+**configFilePath**. Строковые параметр. Определяет путь до файла с конфигурацией приложения.
+    Если аргумент не передан, то приложение пытается открыть файл `appsettings.json`, в корневом каталоге приложения
+
+### Примеры запуска
+
+``` shell 
+# Запуск без аргументов
+./HeartBeatMonitor-linux-amd64
+
+# Указываем путь до конфигурационного файла
+./HeartBeatMonitor-linux-amd64 -configFilePath=/home/user/.config/hbm/appsettings.json
+```
 
 
 ## Пример файла hbm.service
