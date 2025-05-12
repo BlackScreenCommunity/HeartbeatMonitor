@@ -33,9 +33,7 @@ WORKDIR /app
 
 COPY --from=builder /app/HeartBeatMonitor .
 COPY --from=builder /app/templates ./templates
-COPY --from=builder /app/appsettings.json .
 COPY --from=builder /app/internal/plugins/*/*.css ./templates/
 
-EXPOSE 80
-
 ENTRYPOINT ["./HeartBeatMonitor"]
+CMD ["-configFilePath", "/config/appsettings.json"]

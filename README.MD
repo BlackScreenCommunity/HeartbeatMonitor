@@ -108,20 +108,22 @@ WantedBy=multi-user.target
 ### Сборка Docker-image
 
 ``` shell
-docker run -d \
-    -p 80:80 \
-    --name heartbeatmonitor \
-    --security-opt apparmor=unconfined \
-    -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    heartbeatmonitor:latest
+docker build \
+    --no-cache \
+    --build-arg COMMIT_HASH=$(git rev-parse --short HEAD) \
+    --build-arg VERSION_DATE_PART=$(date +%Y%m%d.%H%M) \
+    -t heartbeatmonitor:latest .
 ```
 
 ### Запуск Docker-container
 
 ``` shell
 docker run -d \
-    -p 80:80 \
+    -p 8089:8088 \
     --name heartbeatmonitor \
+    --security-opt apparmor=unconfined \
+    -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v $(pwd)/appsettings.json:/config/appsettings.json \
     heartbeatmonitor:latest
 ```
