@@ -76,8 +76,7 @@ WantedBy=multi-user.target
 ```
 
 
-## Docker-контейнер [!PAUSED]
-
+## Docker-контейнер
 
 ### Работоспособность плагинов
 

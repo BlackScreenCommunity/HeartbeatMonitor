@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  heartbeatmonitor:
+    image: heartbeatmonitor:latest
+    container_name: heartbeatmonitor
+    ports:
+      - "8088:8088"
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./appsettings.json:/config/appsettings.json
+      - /etc/localtime:/etc/localtime:ro
+      - /:/host:ro
+    restart: unless-stopped
