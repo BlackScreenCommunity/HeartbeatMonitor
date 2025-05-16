@@ -81,6 +81,19 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 	}
 	defer resp.Body.Close()
 
+	return ParseResponseFromAgent(resp)
+
+}
+
+// Read the response from an agent
+// Convert the response body to a map
+// If there is an error during reading, parsing, or if the HTTP status code is not OK,
+// Return "Error" if there is an error during reading, parsing, or if the HTTP status code is not 200
+
+func ParseResponseFromAgent(resp *http.Response) map[string]interface{} {
+
+	results := make(map[string]interface{})
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		results["Error"] = err.Error()
