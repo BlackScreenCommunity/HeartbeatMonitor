@@ -3,6 +3,7 @@ package agentDispatcher
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"project/internal/applicationConfigurationDispatcher"
 	"time"
@@ -79,7 +80,12 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 		results["Error"] = err.Error()
 		return results
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("Agent %s doesn't response correctly: %v", agent.Name, err)
+		}
+	}()
 
 	return ParseResponseFromAgent(resp)
 

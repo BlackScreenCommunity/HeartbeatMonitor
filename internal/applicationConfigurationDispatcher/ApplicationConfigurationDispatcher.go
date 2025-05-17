@@ -61,7 +61,11 @@ func loadConfigFromFile(configFilePath string) (ApplicationConfiguration, error)
 		return ApplicationConfiguration{}, fmt.Errorf("error opening config file: %v", err)
 	}
 
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error while openong file: %v", err)
+		}
+	}()
 
 	var data ApplicationConfiguration
 	if err := json.NewDecoder(file).Decode(&data); err != nil {

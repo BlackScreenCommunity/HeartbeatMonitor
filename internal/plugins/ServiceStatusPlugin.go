@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"fmt"
+	"log"
 	"project/internal/utils"
 
 	"github.com/godbus/dbus/v5"
@@ -22,14 +23,19 @@ func (v ServiceStatusPlugin) Collect() (map[string]interface{}, error) {
 
 	conn, err := dbus.SystemBus()
 	if err != nil {
-		return nil, fmt.Errorf("не удалось подключиться к D-Bus: %v", err)
+		return nil, fmt.Errorf("failed to connect to D-Bus: %v", err)
 	}
-	defer conn.Close()
+
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Printf("Error while reading data from D-Bus : %v", err)
+		}
+	}()
 
 	for _, service := range servicesToCheck {
 		status, err := getServiceStatusDBus(conn, service)
 		if err != nil {
-			results[service] = fmt.Sprintf("Ошибка: %v", err)
+			results[service] = fmt.Sprintf("Error: %v", err)
 		} else {
 			results[service] = status
 		}

@@ -31,7 +31,11 @@ func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfi
 	ServerInfo = serverInfo
 
 	mux := InitEndpoints()
-	StartServer(mux, webServerConfig)
+
+	err := StartServer(mux, webServerConfig)
+	if err != nil {
+		log.Fatalf("Error while webserver starting %v", err)
+	}
 }
 
 // Defines enpoint handlers
@@ -56,7 +60,10 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
 
 	responseWriter.Header().Set("Content-Type", "application/json")
-	responseWriter.Write([]byte(string(pluginResultCollection)))
+	_, err := responseWriter.Write([]byte(string(pluginResultCollection)))
+	if err != nil {
+		log.Printf("Error while getting plugins data: %v", err)
+	}
 }
 
 func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebServerConfig) error {
@@ -110,7 +117,10 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 			New("NotFound.html").
 			Funcs(template.FuncMap{"serverInfo": getServerName}).
 			ParseFiles("templates/NotFound.html"))
-		tmpl404.Execute(responseWriter, ServerInfo)
+		err := tmpl404.Execute(responseWriter, ServerInfo)
+		if err != nil {
+			log.Printf("Error while handling 404 error : %v", err)
+		}
 		return
 	}
 	totalResults := make(map[string]interface{})
@@ -153,7 +163,11 @@ func HandlePlugins(responseWriter http.ResponseWriter) {
 
 		jsonData, _ := json.Marshal(pluginData)
 
-		fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		_, err = fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		if err != nil {
+			log.Printf("Error while response to a server : %v", err)
+		}
+
 		responseWriter.(http.Flusher).Flush()
 
 	}
@@ -202,7 +216,11 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 
 		jsonData, _ := json.Marshal(agentDataChunk)
 
-		fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		_, err := fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+		if err != nil {
+			log.Printf("Error while responsing to a client : %v", err)
+		}
+
 		responseWriter.(http.Flusher).Flush()
 
 	}
@@ -219,7 +237,10 @@ func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/css")
-	w.Write(css)
+	_, err = w.Write(css)
+	if err != nil {
+		log.Printf("Error while merging css files : %v", err)
+	}
 }
 
 func mergeCSSFiles(dir string) ([]byte, error) {
@@ -234,7 +255,12 @@ func mergeCSSFiles(dir string) ([]byte, error) {
 			if err != nil {
 				return err
 			}
-			defer file.Close()
+
+			defer func() {
+				if err := file.Close(); err != nil {
+					log.Printf("Error while openong file: %v", err)
+				}
+			}()
 
 			_, err = io.Copy(&buffer, file)
 			if err != nil {

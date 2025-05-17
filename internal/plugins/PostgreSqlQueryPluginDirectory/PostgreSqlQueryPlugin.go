@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"reflect"
 	"strconv"
 	"time"
@@ -38,9 +39,14 @@ func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 
 	db, err := sql.Open("postgres", plugin.ConnectionString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %v", err)
+		return nil, fmt.Errorf("ailed to connect to database: %v", err)
 	}
-	defer db.Close()
+
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("Connection to database closed incorrectly : %v", err)
+		}
+	}()
 
 	for _, query := range plugin.Queries {
 		data, ok := query.(map[string]interface{})
@@ -56,7 +62,12 @@ func (plugin PostgreSqlQueryPlugin) Collect() (map[string]interface{}, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to execute query: %v", err)
 		}
-		defer rows.Close()
+
+		defer func() {
+			if err := rows.Close(); err != nil {
+				log.Printf("Error while reading data from query : %v", err)
+			}
+		}()
 
 		columns, err := rows.Columns()
 		if err != nil {
