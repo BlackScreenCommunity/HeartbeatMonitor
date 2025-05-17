@@ -17,16 +17,15 @@ type PluginConfig struct {
 // Collection of registered plugins for these agent
 var registeredPlugins = make(map[string]plugins.Plugin)
 
+// Creates exemplar of plugins and
+// adds to a list of registered plugins
 func InitializePlugins(pluginsConfig []PluginConfig) {
 	fmt.Println("Loaded plugin configurations:")
-	for _, plugin := range pluginsConfig {
-		fmt.Printf("Name: %s\n",
-			plugin.Name)
-	}
 
-	for _, cfg := range pluginsConfig {
-		if cfg.Active {
-			plugin, err := pluginFactory.CreatePlugin(cfg.Name, cfg.Parameters)
+	for _, pluginConfig := range pluginsConfig {
+		if pluginConfig.Active {
+			fmt.Printf("Create plugin: %s\n", pluginConfig.Name)
+			plugin, err := pluginFactory.CreatePlugin(pluginConfig.Name, pluginConfig.Parameters)
 			if err != nil {
 				fmt.Printf("Error creating plugin: %v\n", err)
 				continue
@@ -36,12 +35,8 @@ func InitializePlugins(pluginsConfig []PluginConfig) {
 	}
 }
 
-func RegisterPlugins(plugins []plugins.Plugin) {
-	for _, registrationPlugin := range plugins {
-		RegisterPlugin(registrationPlugin)
-	}
-}
-
+// Adds current plugin's exemplar
+// into a list of registered plugins
 func RegisterPlugin(p plugins.Plugin) {
 	pluginNumber := fmt.Sprintf("%04d", len(registeredPlugins)+1)
 
@@ -76,6 +71,7 @@ func GetPluginsJsonData() string {
 	return string(jsonData)
 }
 
+// Returns list of registered and active plugins
 func GetPlugins() map[string]plugins.Plugin {
 	return registeredPlugins
 }
