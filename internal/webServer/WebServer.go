@@ -27,6 +27,7 @@ import (
 
 var ServerInfo = applicationConfigurationDispatcher.ServerInfo{}
 
+// Initializes endpoints and starts the webserver
 func RunServer(webServerConfig applicationConfigurationDispatcher.WebServerConfig, serverInfo applicationConfigurationDispatcher.ServerInfo) {
 	ServerInfo = serverInfo
 
@@ -56,6 +57,8 @@ func InitEndpoints() *http.ServeMux {
 	return mux
 }
 
+// Fetches data from agents
+// and responds data to client in a JSON form
 func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	pluginResultCollection := pluginDispatcher.GetPluginsJsonData()
 
@@ -66,6 +69,7 @@ func GetPluginResultsHandler(responseWriter http.ResponseWriter, r *http.Request
 	}
 }
 
+// Starts webserver
 func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebServerConfig) error {
 	if mux == nil {
 		return errors.New("mux must not be nil")
@@ -94,6 +98,7 @@ func StartServer(mux *http.ServeMux, cfg applicationConfigurationDispatcher.WebS
 	return nil
 }
 
+// Shuts down the server when termination signal recieved
 func OnServerStopping(srv *http.Server) {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
@@ -109,6 +114,7 @@ func OnServerStopping(srv *http.Server) {
 	}()
 }
 
+// Serves the main page or a 404 page
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
@@ -135,6 +141,7 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Establishes a Server-Sent Events (SSE) connection for sending real-time data
 func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	responseWriter.Header().Set("Content-Type", "text/event-stream")
 	responseWriter.Header().Set("Cache-Control", "no-cache")
@@ -143,6 +150,7 @@ func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	HandleAgents(responseWriter)
 }
 
+// Collects and sends plugin data to the client
 func HandlePlugins(responseWriter http.ResponseWriter) {
 	for name, plugin := range pluginDispatcher.GetPlugins() {
 		data, err := plugin.Collect()
@@ -173,6 +181,7 @@ func HandlePlugins(responseWriter http.ResponseWriter) {
 	}
 }
 
+// Fetches metrics from active agents and sends them as real-time data
 func HandleAgents(responseWriter http.ResponseWriter) {
 	agents := agentDispatcher.GetAgents()
 	resultsChannel := make(chan struct {
@@ -226,14 +235,16 @@ func HandleAgents(responseWriter http.ResponseWriter) {
 	}
 }
 
+// Returns the server's name formatted for HTML templates
 func getServerName() template.HTML {
 	return template.HTML(ServerInfo.Name)
 }
 
+// Serves combined CSS files from the specified directory
 func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
 	css, err := mergeCSSFiles(".")
 	if err != nil {
-		http.Error(w, "Ошибка загрузки CSS", http.StatusInternalServerError)
+		http.Error(w, "CSS file can't loaded correctly ", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "text/css")
@@ -243,6 +254,7 @@ func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Merges all CSS files in a directory
 func mergeCSSFiles(dir string) ([]byte, error) {
 	var buffer bytes.Buffer
 
@@ -274,7 +286,7 @@ func mergeCSSFiles(dir string) ([]byte, error) {
 	return buffer.Bytes(), err
 }
 
-// Basic auth implementation for endpoints
+// Provides HTTP Basic Authentication for endpoints
 func basicAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
