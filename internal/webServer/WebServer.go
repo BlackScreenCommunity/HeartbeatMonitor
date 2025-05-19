@@ -150,37 +150,6 @@ func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	HandleAgents(responseWriter)
 }
 
-// Collects and sends plugin data to the client
-func HandlePlugins(responseWriter http.ResponseWriter) {
-	for name, plugin := range pluginDispatcher.GetPlugins() {
-		data, err := plugin.Collect()
-		if err != nil {
-			fmt.Printf("Error collecting data from plugin %s: %v\n", name, err)
-			continue
-		}
-
-		type DataChunk struct {
-			PluginName string                 `json:"plugin_name"`
-			Data       map[string]interface{} `json:"data"`
-		}
-
-		pluginData := DataChunk{
-			PluginName: plugin.Name(),
-			Data:       data,
-		}
-
-		jsonData, _ := json.Marshal(pluginData)
-
-		_, err = fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
-		if err != nil {
-			log.Printf("Error while response to a server : %v", err)
-		}
-
-		responseWriter.(http.Flusher).Flush()
-
-	}
-}
-
 // Fetches metrics from active agents and sends them as real-time data
 func HandleAgents(responseWriter http.ResponseWriter) {
 	agents := agentDispatcher.GetAgents()

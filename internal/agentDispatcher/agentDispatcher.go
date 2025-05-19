@@ -24,38 +24,6 @@ func InitializePlugins(agentsConfigCollection []applicationConfigurationDispatch
 	pollingTimeout = agentsPollingTimeout
 }
 
-// Gets metric data from a collection of agents
-func GetMetricsFromAgents() map[string]interface{} {
-	resultsChannel := make(chan struct {
-		Key    string
-		Result map[string]interface{}
-	}, len(agents))
-
-	agentResultCollection := make(map[string]interface{})
-
-	for i, agent := range agents {
-		if agent.Active {
-			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
-				result := GetMetricsFromSingleAgent(agent)
-				resultsChannel <- struct {
-					Key    string
-					Result map[string]interface{}
-				}{
-					Key:    agent.Name,
-					Result: result,
-				}
-			}(i, agent)
-		}
-	}
-
-	for range agents {
-		res := <-resultsChannel
-		agentResultCollection[res.Key] = res.Result
-	}
-
-	return agentResultCollection
-}
-
 // Fetchs data from an external agent via API
 func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentConfig) map[string]interface{} {
 	results := make(map[string]interface{})
