@@ -1,24 +1,22 @@
 package webServer
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
 	"log"
-	"math"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
+	"project/internal/DTO"
 	"project/internal/agentDispatcher"
 	"project/internal/applicationConfigurationDispatcher"
 	"project/internal/pluginDispatcher"
+	"project/internal/utils"
 	"strconv"
 	"strings"
 	"syscall"
@@ -118,15 +116,7 @@ func OnServerStopping(srv *http.Server) {
 func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
-		responseWriter.WriteHeader(http.StatusNotFound)
-		tmpl404 := template.Must(template.
-			New("NotFound.html").
-			Funcs(template.FuncMap{"serverInfo": getServerName}).
-			ParseFiles("templates/NotFound.html"))
-		err := tmpl404.Execute(responseWriter, ServerInfo)
-		if err != nil {
-			log.Printf("Error while handling 404 error : %v", err)
-		}
+		HandleNotFoundPage(responseWriter)
 		return
 	}
 	totalResults := make(map[string]interface{})
@@ -138,6 +128,19 @@ func IndexPageHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	responseWriter.Header().Set("Content-Type", "text/html")
 	if err := pageTemplate.Execute(responseWriter, totalResults); err != nil {
 		http.Error(responseWriter, "Error rendering template", http.StatusInternalServerError)
+	}
+}
+
+// Hanlde NotFound response
+func HandleNotFoundPage(responseWriter http.ResponseWriter) {
+	responseWriter.WriteHeader(http.StatusNotFound)
+	tmpl404 := template.Must(template.
+		New("NotFound.html").
+		Funcs(template.FuncMap{"serverInfo": getServerName}).
+		ParseFiles("templates/NotFound.html"))
+	err := tmpl404.Execute(responseWriter, ServerInfo)
+	if err != nil {
+		log.Printf("Error while handling 404 error : %v", err)
 	}
 }
 
@@ -153,54 +156,24 @@ func sseHandler(responseWriter http.ResponseWriter, r *http.Request) {
 // Fetches metrics from active agents and sends them as real-time data
 func HandleAgents(responseWriter http.ResponseWriter) {
 	agents := agentDispatcher.GetAgents()
-	resultsChannel := make(chan struct {
-		Key      string
-		Result   map[string]interface{}
-		Duration float64
-	}, len(agents))
 
-	for i, agent := range agents {
+	resultsChannel := make(chan DTO.AgentDataChunk, len(agents))
+
+	agentDispatcher.GetMetricsFromAgentsAsync(agents, resultsChannel)
+
+	for _, agent := range agents {
 		if agent.Active {
-			go func(i int, agent applicationConfigurationDispatcher.AgentConfig) {
-				start := time.Now()
-				result := agentDispatcher.GetMetricsFromSingleAgent(agent)
-				resultsChannel <- struct {
-					Key      string
-					Result   map[string]interface{}
-					Duration float64
-				}{
-					Key:      agent.Name,
-					Result:   result,
-					Duration: math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
-				}
-			}(i, agent)
+			res := <-resultsChannel
+
+			jsonData, _ := json.Marshal(res)
+
+			_, err := fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
+			if err != nil {
+				log.Printf("Error while responsing to a client : %v", err)
+			}
+
+			responseWriter.(http.Flusher).Flush()
 		}
-	}
-
-	type AgentDataChunk struct {
-		AgentName string                 `json:"agent_name"`
-		Data      map[string]interface{} `json:"data"`
-		Duration  float64                `json:"duration"`
-	}
-
-	for range agents {
-		res := <-resultsChannel
-
-		agentDataChunk := AgentDataChunk{
-			AgentName: res.Key,
-			Data:      res.Result,
-			Duration:  res.Duration,
-		}
-
-		jsonData, _ := json.Marshal(agentDataChunk)
-
-		_, err := fmt.Fprintf(responseWriter, "data: %s\n\n", jsonData)
-		if err != nil {
-			log.Printf("Error while responsing to a client : %v", err)
-		}
-
-		responseWriter.(http.Flusher).Flush()
-
 	}
 }
 
@@ -211,7 +184,7 @@ func getServerName() template.HTML {
 
 // Serves combined CSS files from the specified directory
 func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
-	css, err := mergeCSSFiles(".")
+	css, err := utils.MergeFilesWithExtension(".", ".css")
 	if err != nil {
 		http.Error(w, "CSS file can't loaded correctly ", http.StatusInternalServerError)
 		return
@@ -221,38 +194,6 @@ func serveMergedCSS(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error while merging css files : %v", err)
 	}
-}
-
-// Merges all CSS files in a directory
-func mergeCSSFiles(dir string) ([]byte, error) {
-	var buffer bytes.Buffer
-
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && filepath.Ext(path) == ".css" {
-			file, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-
-			defer func() {
-				if err := file.Close(); err != nil {
-					log.Printf("Error while openong file: %v", err)
-				}
-			}()
-
-			_, err = io.Copy(&buffer, file)
-			if err != nil {
-				return err
-			}
-			buffer.WriteString("\n")
-		}
-		return nil
-	})
-
-	return buffer.Bytes(), err
 }
 
 // Provides HTTP Basic Authentication for endpoints

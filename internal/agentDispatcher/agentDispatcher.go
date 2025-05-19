@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"math"
 	"net/http"
+	"project/internal/DTO"
 	"project/internal/applicationConfigurationDispatcher"
 	"time"
 )
@@ -57,6 +59,23 @@ func GetMetricsFromSingleAgent(agent applicationConfigurationDispatcher.AgentCon
 
 	return ParseResponseFromAgent(resp)
 
+}
+
+// Gets metric data from a collection of agents
+func GetMetricsFromAgentsAsync(agents []applicationConfigurationDispatcher.AgentConfig, resultsChannel chan DTO.AgentDataChunk) {
+	for _, agent := range agents {
+		if agent.Active {
+			go func(agent applicationConfigurationDispatcher.AgentConfig) {
+				start := time.Now()
+				result := GetMetricsFromSingleAgent(agent)
+				resultsChannel <- DTO.AgentDataChunk{
+					AgentName: agent.Name,
+					Data:      result,
+					Duration:  math.Floor((time.Duration(time.Since(start)).Seconds())*100) / 100,
+				}
+			}(agent)
+		}
+	}
 }
 
 // Read the response from an agent
